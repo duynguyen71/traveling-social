@@ -1,0 +1,19 @@
+package com.tv.tvapi.response;
+
+import lombok.Data;
+
+import java.util.Date;
+
+@Data
+public class PostContentResponse {
+
+    private Long id;
+
+    private String caption;
+
+    private FileUploadResponse file;
+
+    private Date createDate;
+
+    private Date updateDate;
+}
