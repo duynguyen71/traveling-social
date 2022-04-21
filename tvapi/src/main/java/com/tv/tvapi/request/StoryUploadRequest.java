@@ -1,4 +1,4 @@
-package com.tv.tvapi.controller;
+package com.tv.tvapi.request;
 
 import lombok.Data;
 

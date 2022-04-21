@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.tv.tvapi.model.MyUserDetail;
 import com.tv.tvapi.model.Role;
+import com.tv.tvapi.model.User;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,6 +26,19 @@ public class JwtService {
     private final String SECRET = "322qrrcccccccccccccccccccccccqawff";
 
     public String generateToken(MyUserDetail user, int day) {
+        Role role = user.getRole();
+        Date expiresAt = new Date(System.currentTimeMillis() + (24 * 60 * 60 * 1000 * day));
+        Algorithm algorithm = Algorithm.HMAC256(SECRET.getBytes());
+        String access_token = JWT.create()
+                .withSubject(user.getEmail())
+                .withExpiresAt(expiresAt)
+                .withIssuer("khanduy@gmail.com")
+                .withClaim("roles", List.of(role.getName().name()))
+                .sign(algorithm);
+        return access_token;
+    }
+
+    public String generateToken(User user, int day) {
         Role role = user.getRole();
         Date expiresAt = new Date(System.currentTimeMillis() + (24 * 60 * 60 * 1000 * day));
         Algorithm algorithm = Algorithm.HMAC256(SECRET.getBytes());

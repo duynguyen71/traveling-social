@@ -5,6 +5,7 @@ import com.tv.tvapi.helper.StoryHelper;
 import com.tv.tvapi.helper.UserHelper;
 import com.tv.tvapi.request.CreatePostRequest;
 import com.tv.tvapi.request.StoryCommentRequest;
+import com.tv.tvapi.request.StoryUploadRequest;
 import com.tv.tvapi.request.UserUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -67,6 +67,10 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                     response.setStatus(HttpStatus.UNAUTHORIZED.value());
                     new ObjectMapper().writeValue(response.getOutputStream(), Map.of("message", "token expired"));
+                }catch (Exception e){
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    new ObjectMapper().writeValue(response.getOutputStream(), Map.of("message", "token is not valid"));
                 }
             } else {
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);

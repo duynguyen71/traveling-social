@@ -1,6 +1,6 @@
 package com.tv.tvapi.helper;
 
-import com.tv.tvapi.controller.StoryUploadRequest;
+import com.tv.tvapi.request.StoryUploadRequest;
 import com.tv.tvapi.exception.FileNotFoundException;
 import com.tv.tvapi.model.*;
 import com.tv.tvapi.request.BaseParamRequest;

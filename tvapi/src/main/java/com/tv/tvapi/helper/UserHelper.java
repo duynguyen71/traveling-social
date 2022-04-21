@@ -1,6 +1,5 @@
 package com.tv.tvapi.helper;
 
-import com.tv.tvapi.controller.StoryUploadRequest;
 import com.tv.tvapi.dto.UserDto;
 import com.tv.tvapi.enumm.EStoryCommentType;
 import com.tv.tvapi.exception.FileNotFoundException;
@@ -14,9 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.FileUrlResource;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +25,6 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Component("UserHelper")
@@ -46,7 +42,7 @@ public class UserHelper {
     private final StoryService storyService;
     private final StoryViewService storyViewService;
     private final StoryCommentService storyCommentService;
-
+    private final JwtService jwtService;
 
     public ResponseEntity<?> getUsers() {
         List<User> users = userService.getUsers();
@@ -158,7 +154,12 @@ public class UserHelper {
         user.setVerificationCode(null);
         user.setActive(1);
         userService.save(user);
-        return BaseResponse.success(null, "Active account success!");
+        String accessToken = jwtService.generateToken(user, 15);
+        String refreshToken = jwtService.generateToken(user, 30);
+        return BaseResponse.
+                success(Map.of("accessToken", accessToken, "refreshToken", refreshToken),
+                        "Active account success!");
+
     }
 
     public ResponseEntity<?> updateCurrentUserInfo(UserUpdateRequest userUpdateRequest) {
