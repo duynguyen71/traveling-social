@@ -17,7 +17,7 @@ public class PostResponse {
 
     private Integer active;
 
-    private UserInfoResponse uploadBy;
+    private UserInfoResponse user;
 
     private List<PostContentResponse> contents = new ArrayList<>();
 

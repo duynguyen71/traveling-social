@@ -11,7 +11,7 @@ public class PostContentResponse {
 
     private String caption;
 
-    private FileUploadResponse file;
+    private FileUploadResponse attachment;
 
     private Date createDate;
 

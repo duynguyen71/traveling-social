@@ -25,9 +25,9 @@ public class PostContent {
     private String caption;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "file_id")
+    @JoinColumn(name = "attachment_id")
     @Where(clause = "active = 1")
-    private FileUpload file;
+    private FileUpload attachment;
 
     private Integer pos;
 

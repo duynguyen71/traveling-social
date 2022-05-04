@@ -1,6 +1,5 @@
 package com.tv.tvapi.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tv.tvapi.model.Follow;
 import com.tv.tvapi.model.User;
 import com.tv.tvapi.repository.FollowRepository;
@@ -28,7 +27,6 @@ public class FollowService {
     public List<Follow> getFollowingUsers(User user,int active) {
         return followRepo.findByFollowerAndActive(user,active);
     }
-
     public int countFollowers(User user,int active) {
         return followRepo.countByUserAndActive(user,active);
     }

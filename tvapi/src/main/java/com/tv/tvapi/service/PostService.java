@@ -1,9 +1,8 @@
 package com.tv.tvapi.service;
 
 import com.tv.tvapi.model.*;
-import com.tv.tvapi.repository.PostCommentRepository;
+import com.tv.tvapi.repository.CommentRepository;
 import com.tv.tvapi.repository.PostContentRepository;
-import com.tv.tvapi.repository.PostLikeRepository;
 import com.tv.tvapi.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -17,15 +16,14 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostContentRepository postMediaFileRepo;
-    private final PostLikeRepository postLikeRepo;
-    private final PostCommentRepository postCommentRepo;
+    private final CommentRepository postCommentRepo;
 
     public Post savePost(Post post) {
         return postRepository.saveAndFlush(post);
     }
 
     public PostContent savePostContent(PostContent postContent) {
-        return postMediaFileRepo.save(postContent);
+        return postMediaFileRepo.saveAndFlush(postContent);
     }
 
     public PostContent getPostMediaFile(Long mediaFileId, Post post) {
@@ -44,16 +42,15 @@ public class PostService {
         return postRepository.getUserPostNative(user.getId(), active, status, pageable);
     }
 
-    public int countPostLike(Post post) {
-        return postLikeRepo.countByPost(post);
+    public List<Post> getPosts(Pageable pageable){
+        return postRepository.getPostsNative(pageable);
     }
 
-    public List<PostLike> getPostLikes(Post post) {
-        return postLikeRepo.findByPost(post);
+    public List<Post> getUserStories(User user,Pageable pageable){
+        return postRepository.getUserStoriesNative(user.getId(),pageable);
     }
 
-
-    public List<PostComment> getPostComments(Post post) {
+    public List<Comment> getPostComments(Post post) {
         return postCommentRepo.findByPost(post);
     }
 }

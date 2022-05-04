@@ -8,13 +8,14 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
-@Table(name = "post_comment")
+@Table(name = "comment")
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostComment {
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,9 +48,12 @@ public class PostComment {
 
     private Integer active;
 
-    @ManyToOne
-    @JoinColumn(name = "parent_id")
-    private PostComment parent;
+
+    @OneToMany(mappedBy = "childComment",fetch = FetchType.LAZY)
+    private List<ParentChildComment> parentComments;
+
+    @OneToMany(mappedBy = "parentComment",fetch = FetchType.LAZY)
+    private List<ParentChildComment> childrenComment;
 
 
 }

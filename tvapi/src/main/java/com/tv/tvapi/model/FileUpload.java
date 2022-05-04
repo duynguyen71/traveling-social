@@ -49,16 +49,12 @@ public class FileUpload {
     @JoinColumn(name = "upload_by")
     private User uploadBy;
 
-    //
-    @OneToMany(mappedBy = "cover", fetch = FetchType.LAZY)
-    private Set<Story> stories = new HashSet<>();
 
-
-    @OneToMany(mappedBy = "file", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "attachment", fetch = FetchType.LAZY)
     private List<PostContent> postContents = new ArrayList<>();
 
     @OneToMany(mappedBy = "attachment", fetch = FetchType.LAZY)
-    private List<PostComment> postComments = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 
 
 }

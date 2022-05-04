@@ -65,6 +65,7 @@ public class FileStorageService {
     }
 
 
+    //lay ra file da luu trong o dia cua server
     File fileFromStorageRecursive(File file, String name) {
         if (file.isDirectory() && file.listFiles().length > 0) {
             for (File f :
@@ -137,12 +138,8 @@ public class FileStorageService {
         return fileUploadRepo.findByName(name).orElse(null);
     }
 
-    public FileUpload getFileUpload(Long id, User user) {
-        return fileUploadRepo.findByIdAndUploadBy(id, user).orElse(null);
-    }
 
-    public FileUpload getFileFromDbActive(Long fileId,User user, int i) {
-        return fileUploadRepo.findByIdAndUploadByAndActive(fileId,user,i).orElse(null);
-
+    public FileUpload getById(Long id) {
+        return fileUploadRepo.findById(id).orElse(null);
     }
 }

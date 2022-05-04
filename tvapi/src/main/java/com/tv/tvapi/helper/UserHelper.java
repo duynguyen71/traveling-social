@@ -39,9 +39,6 @@ public class UserHelper {
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
     private final FollowService followService;
-    private final StoryService storyService;
-    private final StoryViewService storyViewService;
-    private final StoryCommentService storyCommentService;
     private final JwtService jwtService;
 
     public ResponseEntity<?> getUsers() {
@@ -260,35 +257,6 @@ public class UserHelper {
         detail.setFollowerCounts(followerCounts);
         detail.setFollowingCounts(followingCounts);
         return BaseResponse.success(detail, "get current user detail success!");
-    }
-
-
-    public ResponseEntity<?> commentStory(Long storyId, StoryCommentRequest storyCommentRequest) {
-        Story story = storyService.getStoryLast24Hour(1, storyId);
-        if (story == null)
-            return BaseResponse.badRequest("Failed to post comment with story id: " + storyId);
-
-        User currentUser = userService.getCurrentUser();
-
-        Long commentId = storyCommentRequest.getId();
-        String content = storyCommentRequest.getContent();
-        Integer type = storyCommentRequest.getType();
-        StoryComment storyComment;
-        String message = "post comment success";
-        if (commentId != null &&
-                (storyComment = storyCommentService.getById(commentId)) != null) {
-            message = "update comment success!";
-        } else {
-            storyComment = new StoryComment();
-            storyComment.setUser(currentUser);
-            storyComment.setStory(story);
-            storyComment.setType(type == 0 ? EStoryCommentType.PRIVATE : EStoryCommentType.PUBLIC);
-        }
-        storyComment.setContent(content);
-        storyComment.setActive(1);
-        storyComment.setStatus(1);
-        storyComment = storyCommentService.save(storyComment);
-        return BaseResponse.success(modelMapper.map(storyComment, StoryCommentResponse.class), message);
     }
 
 

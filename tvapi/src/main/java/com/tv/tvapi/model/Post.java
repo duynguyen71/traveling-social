@@ -1,5 +1,6 @@
 package com.tv.tvapi.model;
 
+import com.tv.tvapi.enumm.EPostType;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -21,7 +22,7 @@ public class Post {
     @Column(nullable = false)
     private String caption;
 
-    @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     @OrderBy("pos ASC")
     private List<PostContent> contents = new LinkedList<>();
 
@@ -39,10 +40,12 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Enumerated(EnumType.ORDINAL)
+    private EPostType type;
+
     private Integer active;
 
     private Integer status;
 
-    @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
-    private List<PostLike> postLikes = new ArrayList<>();
+
 }

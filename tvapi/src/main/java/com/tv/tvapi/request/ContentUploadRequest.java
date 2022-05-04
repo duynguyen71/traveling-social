@@ -11,5 +11,9 @@ public class ContentUploadRequest {
 
     private String caption;
 
-    private Long fileId;
+    private Long attachmentId;
+
+    private Integer status = 1;
+
+    private Integer active = 1;
 }

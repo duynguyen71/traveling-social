@@ -75,21 +75,11 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "follower")
     private Set<Follow> following = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private Set<Story> stories = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "viewer")
-    private List<StoryView> storyViewed = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<StoryComment> storyComments = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, targetEntity = Post.class, mappedBy = "user")
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<PostLike> postLikes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<PostComment> postComments = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 }

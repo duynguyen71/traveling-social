@@ -1,12 +1,10 @@
 package com.tv.tvapi.controller;
 
+import com.tv.tvapi.helper.CommentHelper;
+import com.tv.tvapi.helper.FileUploadHelper;
 import com.tv.tvapi.helper.PostHelper;
-import com.tv.tvapi.helper.StoryHelper;
 import com.tv.tvapi.helper.UserHelper;
-import com.tv.tvapi.request.CreatePostRequest;
-import com.tv.tvapi.request.StoryCommentRequest;
-import com.tv.tvapi.request.StoryUploadRequest;
-import com.tv.tvapi.request.UserUpdateRequest;
+import com.tv.tvapi.request.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,12 +19,18 @@ import java.util.Map;
 public class MemberController {
 
     private final UserHelper userHelper;
-    private final StoryHelper storyHelper;
     private final PostHelper postHelper;
+    private final FileUploadHelper fileUploadHelper;
+    private final CommentHelper commentHelper;
 
     @GetMapping("/users/me/files/{name}")
     public ResponseEntity<?> findFile(@PathVariable("name") String fileName) {
         return userHelper.getImage(fileName);
+    }
+
+    @PostMapping("/users/me/files")
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
+        return fileUploadHelper.uploadFile(file);
     }
 
     @GetMapping("/users/searching")
@@ -79,7 +83,6 @@ public class MemberController {
         return userHelper.getFollowers();
     }
 
-
     @GetMapping("/users/me/unfollow/{id}")
     public ResponseEntity<?> unFollow(@PathVariable("id") Long id) {
         return userHelper.unFollowUser(id);
@@ -87,23 +90,23 @@ public class MemberController {
 
     @GetMapping("/users/me/stories")
     public ResponseEntity<?> getFriendStories(@RequestParam Map<String, String> params) {
-        return storyHelper.getFriendStories(params);
+        return postHelper.getCurrentUserStories(params);
     }
 
-    @PostMapping("/users/me/stories")
-    public ResponseEntity<?> uploadStory(@RequestBody
-                                         @Valid StoryUploadRequest storyUploadRequest) {
-        return storyHelper.uploadStory(storyUploadRequest);
+    @PostMapping("/posts/{id}/comments")
+    public ResponseEntity<?> commentPost(@PathVariable("id") Long id, @RequestBody PostCommentRequest postCommentRequest) {
+        return commentHelper.commentPost(id, postCommentRequest);
     }
 
-    @GetMapping("/stories/{storyId}")
-    public ResponseEntity<?> viewStory(@PathVariable("storyId") Long storyId) {
-        return storyHelper.getStory(storyId);
+    @GetMapping("/posts/{id}/comments")
+    public ResponseEntity<?> getPostComments(@PathVariable("id") Long postId, @RequestParam Map<String, String> params) {
+        return commentHelper.getPostComments(postId, params);
     }
 
-    @PostMapping("/stories/{storyId}/comments")
-    public ResponseEntity<?> commentStory(@PathVariable("storyId") Long storyId, @RequestBody @Valid StoryCommentRequest storyCommentRequest) {
-        return userHelper.commentStory(storyId, storyCommentRequest);
+    @GetMapping("/comments/{commentId}")
+    public ResponseEntity<?> getComment(@PathVariable("commentId") Long commentId, @RequestParam Map<String, String> params) {
+        return commentHelper.getComment(commentId, params);
     }
+
 
 }

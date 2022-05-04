@@ -14,8 +14,6 @@ public interface FileUploadRepository extends JpaRepository<FileUpload, Long> {
 
     Optional<FileUpload> findByIdAndUploadByAndActive(Long id,User uploadUser,Integer active);
 
-
-
     Optional<FileUpload> findByName(String name);
 
     Optional<FileUpload> findByIdAndUploadBy(Long id, User uploadBy);

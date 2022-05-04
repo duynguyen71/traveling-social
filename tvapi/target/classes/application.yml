@@ -7,7 +7,7 @@ spring:
   zipkin:
     base-url: http://localhost:9411
   datasource:
-    url: jdbc:mysql://localhost:3306/tv_db
+    url: jdbc:mysql://localhost:3306/tv_db?&useUnicode=true&characterEncoding=utf-8&autoReconnect=true
     username: root
     password: password
 
@@ -36,10 +36,10 @@ spring:
   servlet:
     multipart:
       enabled: true
-      max-file-size: 25MB
-      file-size-threshold: 25MB
+      max-file-size: 1GB
+      file-size-threshold: 1GB
       location: C:/Users/Admin/Documents/TV
-      max-request-size: 25MB
+      max-request-size: 1GB
 
 eureka:
   client:

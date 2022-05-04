@@ -7,47 +7,36 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
-@Table(name = "story")
 @Entity
+@Table(name = "parent_child_comment")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Story {
+public class ParentChildComment implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "cover_id")
-    private FileUpload cover;
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parentComment;
 
-    private String description;
-
-    private String type;
-
-    private Integer active = 1;
+    @ManyToOne
+    @JoinColumn(name = "child_comment_id")
+    private Comment childComment;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column
+    @Column(name = "create_date")
     private Date createDate;
 
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "update_date")
     private Date updateDate;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "story")
-    private List<StoryView> storyViews = new ArrayList<>();
-
-    @OneToMany(mappedBy = "story")
-    private List<StoryComment> comments = new ArrayList<>();
 }
