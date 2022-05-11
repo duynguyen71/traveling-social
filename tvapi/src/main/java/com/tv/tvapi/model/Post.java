@@ -47,5 +47,11 @@ public class Post {
 
     private Integer status;
 
+    @OneToMany(mappedBy = "post")
+    private List<PostReaction> reactions  = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    private List<PostComment> postComments = new ArrayList<>();
+
 
 }

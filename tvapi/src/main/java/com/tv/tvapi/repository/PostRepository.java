@@ -33,16 +33,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             value = "SELECT p.* FROM post p JOIN user u " +
                     "ON p.user_id = u.id " +
                     "WHERE p.user_id=:userId " +
-                    "AND  p.active =:active " +
-                    "AND p.status =:status " +
-                    "AND p.type =0 " +
-                    "AND (:hour iS NULL OR p.create_date > DATE_SUB(NOW(),INTERVAL 24 HOUR) )"
+                    "AND (:status IS NULL OR p.status =:status) " +
+                    "AND (:type IS NULL OR p.type =:type) " +
+                    "AND (:hour IS NULL OR p.create_date > DATE_SUB(NOW(),INTERVAL :hour HOUR) )"
     )
-    List<Post> getUserStoriesNative(@Param("userId") Long userId,
-                                    @Param("active") Integer active,
-                                    @Param("status") Integer status,
-                                    @Param("hour") Integer hour,
-                                    Pageable pageable
+    List<Post> getUserPostsNative(@Param("userId") Long userId,
+                                  @Param("status") Integer status,
+                                  @Param("hour") Integer hour,
+                                  @Param("type") Integer type,
+                                  Pageable pageable
     );
 
     @Query(
@@ -54,7 +53,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                     "JOIN follow f ON u.id = f.follower_id \n" +
                     "WHERE u.id = :userId AND f.status =1 \n" +
                     "UNION SELECT :userId) \n" +
-                    "AND p.create_date > SUBDATE(NOW(),INTERVAL 128 HOUR)\n" +
+                    "AND p.create_date > SUBDATE(NOW(),INTERVAL 1000 HOUR)\n" +
                     "AND p.type = 0"
     )
     List<Post> getUserStoriesNative(@Param("userId") Long userId, Pageable pageable);

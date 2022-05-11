@@ -81,5 +81,9 @@ public class User {
 
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Comment> comments = new ArrayList<>();
+    private List<PostComment> postComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    private List<PostReaction> postReactions = new ArrayList<>();
+
 }

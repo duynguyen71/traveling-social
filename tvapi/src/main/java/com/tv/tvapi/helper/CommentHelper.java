@@ -1,14 +1,13 @@
 package com.tv.tvapi.helper;
 
-import com.tv.tvapi.model.Comment;
-import com.tv.tvapi.model.ParentChildComment;
+import com.tv.tvapi.model.PostComment;
 import com.tv.tvapi.model.Post;
 import com.tv.tvapi.model.User;
 import com.tv.tvapi.request.BaseParamRequest;
 import com.tv.tvapi.request.PostCommentRequest;
 import com.tv.tvapi.response.BaseResponse;
 import com.tv.tvapi.response.CommentResponse;
-import com.tv.tvapi.service.CommentService;
+import com.tv.tvapi.service.PostCommentService;
 import com.tv.tvapi.service.PostService;
 import com.tv.tvapi.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,7 +27,7 @@ public class CommentHelper {
 
     private final UserService userService;
     private final PostService postService;
-    private final CommentService commentService;
+    private final PostCommentService postCommentService;
     private final ModelMapper modelMapper;
 
     public ResponseEntity<?> getPostComments(Long postId, Map<String, String> params) {
@@ -35,15 +35,15 @@ public class CommentHelper {
         Pageable pageable = paramRequest.toPageRequest();
         Post post = postService.getById(postId);
         if (post != null) {
-            List<Comment> comments = commentService.getComments(post, pageable);
-            List<CommentResponse> commentResps = comments.stream()
+            List<PostComment> postComments = postCommentService.getPostComments(post, 1, pageable);
+            List<CommentResponse> rs = postComments.stream()
                     .map(comment -> {
                         CommentResponse commentResp = modelMapper.map(comment, CommentResponse.class);
                         return commentResp;
                     }).collect(Collectors.toList());
-            return BaseResponse.success(commentResps, "Get post comments success!");
+            return BaseResponse.success(rs, "Get post comments success!");
         }
-        return null;
+        return BaseResponse.success(new ArrayList<>(), null);
 
     }
 
@@ -55,37 +55,29 @@ public class CommentHelper {
             if (attachmentId == null && content == null)
                 return BaseResponse.badRequest("Comment content is empty");
             Long commentReqId = request.getId();
-            Comment comment;
+            PostComment postComment;
             User currentUser = userService.getCurrentUser();
             if (commentReqId != null
-                    && (comment = commentService.getByIdAndUser(commentReqId, currentUser)) != null) {
+                    && (postComment = postCommentService.getByIdAndUser(commentReqId, currentUser)) != null) {
                 //update comment
             } else {
-                comment = new Comment();
-                comment.setPost(post);
-                comment.setUser(currentUser);
+                postComment = new PostComment();
+                postComment.setPost(post);
+                postComment.setUser(currentUser);
             }
-            comment.setContent(content);
-            comment.setStatus(comment.getStatus());
-            comment = commentService.save(comment);
+            postComment.setContent(content);
+            postComment.setStatus(postComment.getStatus());
+            postComment = postCommentService.save(postComment);
 
             //
             Long parentCommentId = request.getParentCommentId();
-            if (parentCommentId != null) {
-                Comment parentComment = commentService.getById(parentCommentId);
-                if (parentComment != null) {
-                    ParentChildComment parentChildComment = new ParentChildComment();
-                    parentChildComment.setParentComment(parentComment);
-                    parentChildComment.setChildComment(comment);
-                    commentService.save(parentChildComment);
-                }
-            }
+
             //attachment
             if (attachmentId != null) {
                 //TODO: save attachment
             }
 
-            return BaseResponse.success(modelMapper.map(comment, CommentResponse.class), "Post comment success");
+            return BaseResponse.success(modelMapper.map(postComment, CommentResponse.class), "Post comment success");
 
         }
         return BaseResponse.badRequest("Can not find post with id: " + id);

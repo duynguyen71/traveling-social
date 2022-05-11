@@ -206,7 +206,9 @@ public class UserHelper {
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<?> getFollowingUsers() {
+    public ResponseEntity<?> getFollowingUsers(Map<String,String> param) {
+        BaseParamRequest baseParam = new BaseParamRequest(param);
+        Pageable pageable = baseParam.toPageRequest();
         List<Follow> follows = followService.getFollowingUsers(userService.getCurrentUser(), 1);
         List<UserInfoResponse> rs = follows.stream()
                 .map(f -> modelMapper.map(f.getUser(), UserInfoResponse.class))

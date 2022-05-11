@@ -8,52 +8,38 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
-@Table(name = "comment")
 @Entity
+@Table(name = "post_reaction")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment {
+public class PostReaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String content;
-
-    @ManyToOne
-    @JoinColumn(name = "attachment")
-    private FileUpload attachment;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 
     @ManyToOne
+    @JoinColumn(name = "reaction_id")
+    private Reaction reaction;
+
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(updatable = false)
-    private Date createDate;
-
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updateDate;
-
+    @Column
     private Integer status;
 
-    private Integer active;
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
+    private Date createDate;
 
-
-    @OneToMany(mappedBy = "childComment",fetch = FetchType.LAZY)
-    private List<ParentChildComment> parentComments;
-
-    @OneToMany(mappedBy = "parentComment",fetch = FetchType.LAZY)
-    private List<ParentChildComment> childrenComment;
-
-
+    @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
+    private Date updateDate;
 }

@@ -1,11 +1,13 @@
 package com.tv.tvapi.model;
 
-import com.tv.tvapi.enumm.EReaction;
+import com.tv.tvapi.enumm.EReactionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "reaction")
@@ -18,6 +20,12 @@ public class Reaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private EReaction type;
+    @Enumerated(EnumType.ORDINAL)
+    private EReactionType type;
+
+
+    @OneToMany(mappedBy = "reaction",fetch = FetchType.LAZY)
+    private List<PostReaction> posts = new ArrayList<>();
+
+
 }

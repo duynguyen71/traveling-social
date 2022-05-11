@@ -37,6 +37,8 @@ public class PostContent {
 
     private Integer active;
 
+    private Integer status;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_date", updatable = false)

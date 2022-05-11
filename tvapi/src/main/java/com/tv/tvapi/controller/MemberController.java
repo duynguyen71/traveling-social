@@ -1,9 +1,6 @@
 package com.tv.tvapi.controller;
 
-import com.tv.tvapi.helper.CommentHelper;
-import com.tv.tvapi.helper.FileUploadHelper;
-import com.tv.tvapi.helper.PostHelper;
-import com.tv.tvapi.helper.UserHelper;
+import com.tv.tvapi.helper.*;
 import com.tv.tvapi.request.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.ws.rs.Path;
 import java.util.Map;
 
 @RestController
@@ -22,6 +20,7 @@ public class MemberController {
     private final PostHelper postHelper;
     private final FileUploadHelper fileUploadHelper;
     private final CommentHelper commentHelper;
+    private final PostReactionHelper postReactionHelper;
 
     @GetMapping("/users/me/files/{name}")
     public ResponseEntity<?> findFile(@PathVariable("name") String fileName) {
@@ -54,8 +53,8 @@ public class MemberController {
     }
 
     @GetMapping("/users/me/following")
-    public ResponseEntity<?> getFollowingUsers() {
-        return userHelper.getFollowingUsers();
+    public ResponseEntity<?> getFollowingUsers(@RequestParam Map<String,String> param) {
+        return userHelper.getFollowingUsers(param);
     }
 
     @GetMapping("/users/me/following/{userId}")
@@ -66,6 +65,11 @@ public class MemberController {
     @GetMapping("/users/me/posts")
     public ResponseEntity<?> getCurrentUserPosts(@RequestParam Map<String, String> params) {
         return postHelper.getCurrentUserPosts(params);
+    }
+
+    @GetMapping("/posts")
+    public ResponseEntity<?> getPosts(@RequestParam Map<String, String> params) {
+        return postHelper.getPosts(params);
     }
 
     @GetMapping("/users/me/posts/{postId}/comments")
@@ -88,10 +92,16 @@ public class MemberController {
         return userHelper.unFollowUser(id);
     }
 
-    @GetMapping("/users/me/stories")
+    @GetMapping("/stories")
     public ResponseEntity<?> getFriendStories(@RequestParam Map<String, String> params) {
-        return postHelper.getCurrentUserStories(params);
+        return postHelper.getStories(params);
     }
+
+    @GetMapping("/users/me/stories")
+    public ResponseEntity<?> getCurrentUserStories(@RequestParam Map<String, String> params) {
+        return postHelper.getStories(params);
+    }
+
 
     @PostMapping("/posts/{id}/comments")
     public ResponseEntity<?> commentPost(@PathVariable("id") Long id, @RequestBody PostCommentRequest postCommentRequest) {
@@ -108,5 +118,19 @@ public class MemberController {
         return commentHelper.getComment(commentId, params);
     }
 
+    /**
+     * tha binh luan cho bai viet (post,story)
+     *
+     * @return
+     */
+    @PostMapping("/posts/reactions")
+    public ResponseEntity<?> postReaction(@RequestBody @Valid ReactionRequest reactionRequest) {
+        return postReactionHelper.savePostReaction( reactionRequest);
+    }
+
+    @GetMapping("/posts/{postId}/reactions")
+    public ResponseEntity<?> getPostReactions(@PathVariable("postId") Long postId) {
+        return postReactionHelper.getPostReactions(postId);
+    }
 
 }

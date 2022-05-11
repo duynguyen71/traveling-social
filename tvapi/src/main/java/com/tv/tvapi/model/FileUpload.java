@@ -54,7 +54,7 @@ public class FileUpload {
     private List<PostContent> postContents = new ArrayList<>();
 
     @OneToMany(mappedBy = "attachment", fetch = FetchType.LAZY)
-    private List<Comment> comments = new ArrayList<>();
+    private List<PostComment> postComments = new ArrayList<>();
 
 
 }

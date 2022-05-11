@@ -1,7 +1,7 @@
 package com.tv.tvapi.service;
 
 import com.tv.tvapi.model.*;
-import com.tv.tvapi.repository.CommentRepository;
+import com.tv.tvapi.repository.PostCommentRepository;
 import com.tv.tvapi.repository.PostContentRepository;
 import com.tv.tvapi.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,11 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostContentRepository postMediaFileRepo;
-    private final CommentRepository postCommentRepo;
+    private final PostCommentRepository postCommentRepo;
+
+    public boolean existById(Long id){
+        return postRepository.existsById(id);
+    }
 
     public Post savePost(Post post) {
         return postRepository.saveAndFlush(post);
@@ -42,15 +46,18 @@ public class PostService {
         return postRepository.getUserPostNative(user.getId(), active, status, pageable);
     }
 
-    public List<Post> getPosts(Pageable pageable){
-        return postRepository.getPostsNative(pageable);
+    public List<Post> getUserStories(User user, Pageable pageable) {
+        return postRepository.getUserStoriesNative(user.getId(), pageable);
     }
 
-    public List<Post> getUserStories(User user,Pageable pageable){
-        return postRepository.getUserStoriesNative(user.getId(),pageable);
-    }
-
-    public List<Comment> getPostComments(Post post) {
+    public List<PostComment> getPostComments(Post post) {
         return postCommentRepo.findByPost(post);
+    }
+
+    public List<Post> getUserPosts(User user, Integer status, Pageable pageable) {
+        return postRepository.getUserPostsNative(user.getId(), status, null, 1, pageable);
+    }
+    public List<Post> getUserStories(User user, Integer status, Integer hour, Pageable pageable) {
+        return postRepository.getUserPostsNative(user.getId(), status, hour, 1, pageable);
     }
 }

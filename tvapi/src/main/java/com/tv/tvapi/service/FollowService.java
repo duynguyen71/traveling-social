@@ -5,6 +5,7 @@ import com.tv.tvapi.model.User;
 import com.tv.tvapi.repository.FollowRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class FollowService {
         return followRepo.findByUser(user);
     }
 
-    public List<Follow> getFollowingUsers(User user,int active) {
+    public List<Follow> getFollowingUsers(User user, int active) {
         return followRepo.findByFollowerAndActive(user,active);
     }
     public int countFollowers(User user,int active) {

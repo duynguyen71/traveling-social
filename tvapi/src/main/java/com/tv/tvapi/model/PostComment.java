@@ -7,36 +7,50 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
+@Table(name = "post_comment")
 @Entity
-@Table(name = "parent_child_comment")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class ParentChildComment implements Serializable {
+@AllArgsConstructor
+public class PostComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "parent_comment_id")
-    private PostComment parentPostComment;
+    private String content;
 
     @ManyToOne
-    @JoinColumn(name = "child_comment_id")
-    private PostComment childPostComment;
+    @JoinColumn(name = "attachment_id")
+    private FileUpload attachment;
+
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "create_date")
+    @Column(updatable = false)
     private Date createDate;
 
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "update_date")
     private Date updateDate;
+
+    private Integer status;
+
+    @ManyToOne
+    @JoinColumn(name = "parent_comment_id")
+    private PostComment parent;
+
+    @OneToMany(mappedBy = "parent")
+    private List<PostComment> answers = new ArrayList<>();
+
 
 }

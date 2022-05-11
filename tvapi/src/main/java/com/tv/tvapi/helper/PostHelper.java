@@ -6,6 +6,7 @@ import com.tv.tvapi.request.CreatePostRequest;
 import com.tv.tvapi.request.ContentUploadRequest;
 import com.tv.tvapi.response.*;
 import com.tv.tvapi.service.FileStorageService;
+import com.tv.tvapi.service.PostReactionService;
 import com.tv.tvapi.service.PostService;
 import com.tv.tvapi.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component("PostHelper")
 @RequiredArgsConstructor
@@ -27,33 +27,32 @@ public class PostHelper {
     private final PostService postService;
     private final ModelMapper modelMapper;
     private final FileStorageService fileStorageService;
+    private final PostReactionService postReactionService;
 
+    /**
+     * Lay ra cac bai post cua user hien tai
+     *
+     * @param params
+     * @return
+     */
     public ResponseEntity<?> getCurrentUserPosts(Map<String, String> params) {
         User currentUser = userService.getCurrentUser();
         BaseParamRequest baseParamRequest = new BaseParamRequest(params);
 
         Pageable pageable = baseParamRequest.toPageRequest();
-        List<Post> posts = postService.getUserPost(currentUser, pageable, 1, 1);
 
-        List<PostResponse> data = posts.stream()
+        List<Post> posts = postService.getUserPosts(currentUser, baseParamRequest.getStatus(), pageable);
+        List<PostResponse> rs = posts.stream()
                 .map(post -> {
                     PostResponse postResponse = modelMapper.map(post, PostResponse.class);
-                    List<PostContent> postContents = postService.getPostContents(post);
-                    postResponse.setContents(
-                            postContents.stream()
-                                    .map(content -> {
-                                        PostContentResponse postContentResponse = modelMapper.map(content, PostContentResponse.class);
-                                        FileUploadResponse map = modelMapper.map(content.getAttachment(), FileUploadResponse.class);
-                                        postContentResponse.setAttachment(map);
-                                        return postContentResponse;
-                                    })
-                                    .collect(Collectors.toList())
-                    );
-                    return postResponse;
-                })
-                .collect(Collectors.toList());
+                    //lay ra so luong reactions
+                    Long reactionCount = postReactionService.countReactions(post);
+                    postResponse.setReactionCount(reactionCount);
 
-        return BaseResponse.success(data, "get current user's post success");
+                    return postResponse;
+                }).collect(Collectors.toList());
+
+        return BaseResponse.success(rs, "get user id: " + currentUser.getId() + "\'s posts success!");
     }
 
     public ResponseEntity<?> createPost(CreatePostRequest createPostRequest) {
@@ -119,9 +118,9 @@ public class PostHelper {
 
     public ResponseEntity<?> getPostComments(Long postId) {
 
-        List<Comment> comments = postService.getPostComments(postService.getById(postId));
+        List<PostComment> postComments = postService.getPostComments(postService.getById(postId));
 
-        List<CommentResponse> data = comments.stream()
+        List<CommentResponse> data = postComments.stream()
                 .map(comment -> {
                     CommentResponse commentResponse = modelMapper.map(comment, CommentResponse.class);
                     return commentResponse;
@@ -130,7 +129,7 @@ public class PostHelper {
         return BaseResponse.success(data, "Get post comments with post id: " + postId + " success!");
     }
 
-    public ResponseEntity<?> getCurrentUserStories(Map<String, String> params) {
+    public ResponseEntity<?> getStories(Map<String, String> params) {
         User currentUser = userService.getCurrentUser();
         BaseParamRequest baseParamRequest = new BaseParamRequest(params);
 
@@ -155,27 +154,37 @@ public class PostHelper {
 
 
     public ResponseEntity<?> getPosts(Map<String, String> params) {
-        BaseParamRequest baseParamReq = new BaseParamRequest(params);
-        Pageable pageable = baseParamReq.toPageRequest();
-        List<Post> posts = postService.getPosts(pageable);
-        Stream<PostResponse> rs = posts.stream()
+        User currentUser = userService.getCurrentUser();
+        BaseParamRequest baseParamRequest = new BaseParamRequest(params);
+
+        Pageable pageable = baseParamRequest.toPageRequest();
+        List<Post> posts = postService.getUserPost(currentUser, pageable, 1, 1);
+
+        List<PostResponse> data = posts.stream()
                 .map(post -> {
-                    PostResponse resp = modelMapper.map(post, PostResponse.class);
-                    //get post contents
+                    PostResponse postResponse = modelMapper.map(post, PostResponse.class);
+                    postResponse.setReactionCount(postReactionService.countReactions(post));
+                    //lay ra reaction cua user hien tai
+                    PostReaction postReaction = postReactionService.getByUser(currentUser, post, 1);
+                    if (postReaction != null)
+                        postResponse.setMyReaction(modelMapper.map(postReaction.getReaction(), ReactionResponse.class));
+                    //lay ra noi dung bai post
                     List<PostContent> postContents = postService.getPostContents(post);
-                    List<PostContentResponse> postContentResponses = postContents.stream()
-                            .map(postContent -> {
-                                PostContentResponse postContentResponse = modelMapper.map(postContent, PostContentResponse.class);
-                                return postContentResponse;
-                            })
-                            .toList();
-                    resp.setContents(postContentResponses);
-                    //get upload user
-                    User user = post.getUser();
-                    resp.setUser(modelMapper.map(user, UserInfoResponse.class));
-                    return resp;
-                });
-        return BaseResponse.success(rs, "Get posts success!");
+                    postResponse.setContents(
+                            postContents.stream()
+                                    .map(content -> {
+                                        PostContentResponse postContentResponse = modelMapper.map(content, PostContentResponse.class);
+                                        FileUploadResponse map = modelMapper.map(content.getAttachment(), FileUploadResponse.class);
+                                        postContentResponse.setAttachment(map);
+                                        return postContentResponse;
+                                    })
+                                    .collect(Collectors.toList())
+                    );
+                    return postResponse;
+                })
+                .collect(Collectors.toList());
+
+        return BaseResponse.success(data, "get current user's post success");
     }
 
 
