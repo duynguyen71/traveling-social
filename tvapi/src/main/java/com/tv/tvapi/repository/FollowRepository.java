@@ -4,6 +4,8 @@ import com.tv.tvapi.model.Follow;
 import com.tv.tvapi.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,13 +15,29 @@ import java.util.Optional;
 public interface FollowRepository extends JpaRepository<Follow, Long> {
 
 
-    int countByUserAndActive(User user,int active);
+    int countByUserAndActive(User user, int active);
 
-    int countByFollowerAndActive(User follower,int active);
+    int countByFollowerAndActive(User follower, int active);
 
-    List<Follow> findByUser(User user);
+    Optional<Follow> findByUserAndFollowerAndActive(User user, User follower, int active);
 
-    List<Follow> findByFollowerAndActive(User follower, int active);
+    @Query(
+            nativeQuery = true,
+            value = "SELECT f.* FROM user u \n" +
+                    "JOIN follow f \n" +
+                    "ON u.id = f.user_id\n" +
+                    "WHERE u.id = :userId\n" +
+                    "AND f.status = 1"
+    )
+    List<Follow> getFollowerNative(@Param("userId") Long userId,Pageable pageable);
 
-    Optional<Follow> findByUserAndFollowerAndActive(User user, User follower,int active);
+    @Query(
+            nativeQuery = true,
+            value = "SELECT f.* FROM user u \n" +
+                    "JOIN follow f \n" +
+                    "ON u.id = f.follower_id\n" +
+                    "WHERE u.id = :userId\n" +
+                    "AND f.status = 1"
+    )
+    List<Follow> getFollowingNative(@Param("userId") Long userId,Pageable pageable);
 }

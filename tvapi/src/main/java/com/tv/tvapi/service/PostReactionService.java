@@ -37,7 +37,7 @@ public class PostReactionService {
     }
 
     public Long countReactions(Post post) {
-        return postReactionRepo.countByPost(post);
+        return postReactionRepo.countByPostAndStatus(post,1);
     }
 
 }

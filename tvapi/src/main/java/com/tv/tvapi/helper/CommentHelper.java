@@ -1,5 +1,6 @@
 package com.tv.tvapi.helper;
 
+import com.tv.tvapi.model.FileUpload;
 import com.tv.tvapi.model.PostComment;
 import com.tv.tvapi.model.Post;
 import com.tv.tvapi.model.User;
@@ -7,6 +8,7 @@ import com.tv.tvapi.request.BaseParamRequest;
 import com.tv.tvapi.request.PostCommentRequest;
 import com.tv.tvapi.response.BaseResponse;
 import com.tv.tvapi.response.CommentResponse;
+import com.tv.tvapi.service.FileStorageService;
 import com.tv.tvapi.service.PostCommentService;
 import com.tv.tvapi.service.PostService;
 import com.tv.tvapi.service.UserService;
@@ -16,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,21 +30,18 @@ public class CommentHelper {
     private final PostService postService;
     private final PostCommentService postCommentService;
     private final ModelMapper modelMapper;
+    private final FileStorageService fileStorageService;
 
-    public ResponseEntity<?> getPostComments(Long postId, Map<String, String> params) {
+    public ResponseEntity<?> getPostParentComments(Long postId, Map<String, String> params) {
         BaseParamRequest paramRequest = new BaseParamRequest(params);
         Pageable pageable = paramRequest.toPageRequest();
-        Post post = postService.getById(postId);
-        if (post != null) {
-            List<PostComment> postComments = postCommentService.getPostComments(post, 1, pageable);
-            List<CommentResponse> rs = postComments.stream()
-                    .map(comment -> {
-                        CommentResponse commentResp = modelMapper.map(comment, CommentResponse.class);
-                        return commentResp;
-                    }).collect(Collectors.toList());
-            return BaseResponse.success(rs, "Get post comments success!");
-        }
-        return BaseResponse.success(new ArrayList<>(), null);
+        List<PostComment> postComments = postCommentService.getPostParentComments(postId, 1, pageable);
+        List<CommentResponse> rs = postComments.stream()
+                .map(comment -> {
+                    CommentResponse commentResp = modelMapper.map(comment, CommentResponse.class);
+                    return commentResp;
+                }).collect(Collectors.toList());
+        return BaseResponse.success(rs, "Get post comments success!");
 
     }
 
@@ -66,17 +64,20 @@ public class CommentHelper {
                 postComment.setUser(currentUser);
             }
             postComment.setContent(content);
-            postComment.setStatus(postComment.getStatus());
-            postComment = postCommentService.save(postComment);
-
+            postComment.setStatus(1);
             //
             Long parentCommentId = request.getParentCommentId();
-
+            PostComment parentComment = postCommentService.getById(parentCommentId);
+            if (parentCommentId != null && parentComment != null)
+                postComment.setParent(parentComment);
             //attachment
             if (attachmentId != null) {
                 //TODO: save attachment
+                FileUpload fileUpload = fileStorageService.getFileFromDb(attachmentId);
+                if (fileUpload != null)
+                    postComment.setAttachment(fileUpload);
             }
-
+            postComment = postCommentService.save(postComment);
             return BaseResponse.success(modelMapper.map(postComment, CommentResponse.class), "Post comment success");
 
         }
@@ -86,5 +87,25 @@ public class CommentHelper {
     public ResponseEntity<?> getComment(Long commentId, Map<String, String> params) {
 
         return null;
+    }
+
+    public ResponseEntity<?> getCurrentUserPostComments(Long postId) {
+        User currentUser = userService.getCurrentUser();
+        List<PostComment> comments = postCommentService.getCurrentUserPostComments(postService.getById(postId), currentUser, 1);
+        List<CommentResponse> rs = comments.stream()
+                .map(c -> modelMapper.map(c, CommentResponse.class))
+                .collect(Collectors.toList());
+        return BaseResponse.success(rs, "get current user post comments success!");
+    }
+
+    public  ResponseEntity<?> updateCommentStatus(Long commentId,Integer status){
+        User user = userService.getCurrentUser();
+        PostComment comment = postCommentService.getByIdAndUser(commentId, user);
+        if(comment!=null){
+            comment.setStatus(status);
+            postCommentService.save(comment);
+            return BaseResponse.success("update comment status success");
+        }
+        return BaseResponse.badRequest("Could not find comment with id: "+commentId);
     }
 }

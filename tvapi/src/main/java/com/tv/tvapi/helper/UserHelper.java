@@ -1,7 +1,6 @@
 package com.tv.tvapi.helper;
 
 import com.tv.tvapi.dto.UserDto;
-import com.tv.tvapi.enumm.EStoryCommentType;
 import com.tv.tvapi.exception.FileNotFoundException;
 import com.tv.tvapi.exception.FileUploadException;
 import com.tv.tvapi.model.*;
@@ -206,24 +205,23 @@ public class UserHelper {
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<?> getFollowingUsers(Map<String,String> param) {
+    public ResponseEntity<?> getFollowingUsers(Map<String, String> param) {
         BaseParamRequest baseParam = new BaseParamRequest(param);
-        Pageable pageable = baseParam.toPageRequest();
-        List<Follow> follows = followService.getFollowingUsers(userService.getCurrentUser(), 1);
+        List<Follow> follows = followService.getFollowingUsers(userService.getCurrentUser().getId(), baseParam.toPageRequest());
         List<UserInfoResponse> rs = follows.stream()
                 .map(f -> modelMapper.map(f.getUser(), UserInfoResponse.class))
                 .collect(Collectors.toList());
         return BaseResponse.success(rs, "get following users success!");
     }
 
-    public ResponseEntity<?> getFollowers() {
-        List<Follow> follows = followService.getFollowers(userService.getCurrentUser());
+    public ResponseEntity<?> getFollowers(Map<String, String> param) {
+        BaseParamRequest baseParamRequest = new BaseParamRequest(param);
+        List<Follow> follows = followService
+                .getFollowers(userService.getCurrentUser().getId(), baseParamRequest.toPageRequest());
         List<UserInfoResponse> rs = follows.stream()
-                .map(f -> modelMapper.map(f.getUser(), UserInfoResponse.class))
+                .map(f -> modelMapper.map(f.getFollower(), UserInfoResponse.class))
                 .toList();
         return BaseResponse.success(rs, "get followers success!");
-
-
     }
 
     public ResponseEntity<?> followUser(Long userId) {

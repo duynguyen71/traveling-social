@@ -18,9 +18,10 @@ public class PostService {
     private final PostContentRepository postMediaFileRepo;
     private final PostCommentRepository postCommentRepo;
 
-    public boolean existById(Long id){
-        return postRepository.existsById(id);
+    public Post getCurrentUserPost(Long postId, Long userId) {
+        return postRepository.findByIdAndUser_Id(postId, userId).orElse(null);
     }
+
 
     public Post savePost(Post post) {
         return postRepository.saveAndFlush(post);
@@ -57,7 +58,5 @@ public class PostService {
     public List<Post> getUserPosts(User user, Integer status, Pageable pageable) {
         return postRepository.getUserPostsNative(user.getId(), status, null, 1, pageable);
     }
-    public List<Post> getUserStories(User user, Integer status, Integer hour, Pageable pageable) {
-        return postRepository.getUserPostsNative(user.getId(), status, hour, 1, pageable);
-    }
+
 }

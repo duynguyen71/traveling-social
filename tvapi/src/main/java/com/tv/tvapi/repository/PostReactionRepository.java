@@ -19,7 +19,7 @@ public interface PostReactionRepository extends JpaRepository<PostReaction, Long
 
     Optional<PostReaction> findByUser(User user);
 
-    Long countByPost(Post post);
+    Long countByPostAndStatus(Post post,Integer status);
 
     List<PostReaction> getByPostAndStatus(Post post, Integer status);
 

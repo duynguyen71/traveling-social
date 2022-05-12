@@ -5,12 +5,10 @@ import com.tv.tvapi.request.BaseParamRequest;
 import com.tv.tvapi.request.CreatePostRequest;
 import com.tv.tvapi.request.ContentUploadRequest;
 import com.tv.tvapi.response.*;
-import com.tv.tvapi.service.FileStorageService;
-import com.tv.tvapi.service.PostReactionService;
-import com.tv.tvapi.service.PostService;
-import com.tv.tvapi.service.UserService;
+import com.tv.tvapi.service.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -28,6 +26,7 @@ public class PostHelper {
     private final ModelMapper modelMapper;
     private final FileStorageService fileStorageService;
     private final PostReactionService postReactionService;
+    private final PostCommentService postCommentService;
 
     /**
      * Lay ra cac bai post cua user hien tai
@@ -144,7 +143,7 @@ public class PostHelper {
                                     .map(content -> modelMapper.map(content, PostContentResponse.class))
                                     .collect(Collectors.toList())
                     );
-                    postResponse.setLikeCounts(1);
+                    postResponse.setLikeCount(1);
                     return postResponse;
                 })
                 .collect(Collectors.toList());
@@ -164,10 +163,29 @@ public class PostHelper {
                 .map(post -> {
                     PostResponse postResponse = modelMapper.map(post, PostResponse.class);
                     postResponse.setReactionCount(postReactionService.countReactions(post));
-                    //lay ra reaction cua user hien tai
+                    postResponse.setCommentCount(postCommentService.countCommentsOnPost(post));
+                    //get current user reaction on post
                     PostReaction postReaction = postReactionService.getByUser(currentUser, post, 1);
                     if (postReaction != null)
                         postResponse.setMyReaction(modelMapper.map(postReaction.getReaction(), ReactionResponse.class));
+                    //get current users comments on post
+                    List<PostComment> myComments = postCommentService.getCurrentUserPostComments(post, currentUser, 1);
+                    postResponse.setMyComments(
+                            myComments.stream()
+                                    .map(c -> {
+                                        PropertyMap<PostComment, CommentResponse> clientPropertyMap = new PropertyMap<>() {
+                                            @Override
+                                            protected void configure() {
+                                                skip(destination.getUser());
+                                            }
+                                        };
+                                        if (modelMapper.getTypeMap(PostComment.class, CommentResponse.class) == null)
+                                            modelMapper.addMappings(clientPropertyMap);
+                                        CommentResponse commentResponse = modelMapper.map(c, CommentResponse.class);
+                                        return commentResponse;
+                                    })
+                                    .collect(Collectors.toList())
+                    );
                     //lay ra noi dung bai post
                     List<PostContent> postContents = postService.getPostContents(post);
                     postResponse.setContents(
@@ -188,4 +206,13 @@ public class PostHelper {
     }
 
 
+    public ResponseEntity<?> updateStatus(Long postId, Integer status) {
+        Post post = postService.getCurrentUserPost(userService.getCurrentUser().getId(), postId);
+        if (post != null) {
+            post.setStatus(status);
+            postService.savePost(post);
+            return BaseResponse.success("update post " + post + " status success!");
+        }
+        return BaseResponse.badRequest("could not find post with id: " + postId);
+    }
 }

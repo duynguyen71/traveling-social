@@ -18,6 +18,10 @@ public class PostCommentService {
 
     private final PostCommentRepository commentRepo;
 
+    public PostComment getById(Long id){
+        return commentRepo.findById(id).orElse(null);
+    }
+
     public PostComment getByIdAndUser(Long id, User user) {
         return commentRepo.findByIdAndUser(id, user).orElse(null);
     }
@@ -29,14 +33,22 @@ public class PostCommentService {
     /**
      * get post parent comments
      *
-     * @param post
+     * @param postId
+     * @param status
      * @param pageable
      * @return
      */
-    public List<PostComment> getPostComments(Post post, Integer status, Pageable pageable) {
-//        return commentRepo.findByPostAndStatus(post,status,pageable);
-        return commentRepo.findByPostAndParentIsNull(post, pageable);
+    public List<PostComment> getPostParentComments(Long postId, Integer status, Pageable pageable) {
+        return commentRepo.getPostCommentsNative(postId, status, pageable);
     }
 
+    public List<PostComment> getCurrentUserPostComments(Post post, User user, Integer status) {
+        return commentRepo.findByPostAndUserAndStatusAndParentIsNull(post, user, status);
+    }
+
+
+    public Integer countCommentsOnPost(Post post) {
+        return commentRepo.countByPostAndStatus(post, 1);
+    }
 
 }

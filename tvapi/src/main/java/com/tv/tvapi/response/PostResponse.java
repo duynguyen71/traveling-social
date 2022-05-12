@@ -28,8 +28,12 @@ public class PostResponse {
 
     private Date updateDate;
 
-    private Integer likeCounts;
+    private Integer likeCount;
+
+    private Integer commentCount;
 
     private ReactionResponse myReaction;
+
+    private List<CommentResponse> myComments;
 
 }

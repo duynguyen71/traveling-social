@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.ws.rs.Path;
 import java.util.Map;
 
 @RestController
@@ -52,19 +51,14 @@ public class MemberController {
         return userHelper.updateCurrentUserInfo(userUpdateRequest);
     }
 
-    @GetMapping("/users/me/following")
-    public ResponseEntity<?> getFollowingUsers(@RequestParam Map<String,String> param) {
-        return userHelper.getFollowingUsers(param);
-    }
-
-    @GetMapping("/users/me/following/{userId}")
-    public ResponseEntity<?> followRequest(@PathVariable("userId") Long userId) {
-        return userHelper.followUser(userId);
-    }
-
     @GetMapping("/users/me/posts")
     public ResponseEntity<?> getCurrentUserPosts(@RequestParam Map<String, String> params) {
         return postHelper.getCurrentUserPosts(params);
+    }
+
+    @PutMapping("/users/me/posts/{postId}/status/{status}")
+    public ResponseEntity<?> updatePostStatus(@PathVariable("postId") Long postId, @PathVariable("status") Integer status) {
+        return postHelper.updateStatus(postId, status);
     }
 
     @GetMapping("/posts")
@@ -73,7 +67,7 @@ public class MemberController {
     }
 
     @GetMapping("/users/me/posts/{postId}/comments")
-    public ResponseEntity<?> getPostComments(@PathVariable("postId") Long postId) {
+    public ResponseEntity<?> getPostParentComments(@PathVariable("postId") Long postId) {
         return postHelper.getPostComments(postId);
     }
 
@@ -82,15 +76,26 @@ public class MemberController {
         return postHelper.createPost(createPostRequest);
     }
 
+    @GetMapping("/users/me/following")
+    public ResponseEntity<?> getFollowingUsers(@RequestParam Map<String, String> param) {
+        return userHelper.getFollowingUsers(param);
+    }
+
+    @GetMapping("/users/me/following/{userId}")
+    public ResponseEntity<?> followRequest(@PathVariable("userId") Long userId) {
+        return userHelper.followUser(userId);
+    }
+
     @GetMapping("/users/me/followers")
-    public ResponseEntity<?> getFollowers() {
-        return userHelper.getFollowers();
+    public ResponseEntity<?> getFollowers(@RequestParam Map<String, String> param) {
+        return userHelper.getFollowers(param);
     }
 
     @GetMapping("/users/me/unfollow/{id}")
     public ResponseEntity<?> unFollow(@PathVariable("id") Long id) {
         return userHelper.unFollowUser(id);
     }
+
 
     @GetMapping("/stories")
     public ResponseEntity<?> getFriendStories(@RequestParam Map<String, String> params) {
@@ -109,8 +114,24 @@ public class MemberController {
     }
 
     @GetMapping("/posts/{id}/comments")
-    public ResponseEntity<?> getPostComments(@PathVariable("id") Long postId, @RequestParam Map<String, String> params) {
-        return commentHelper.getPostComments(postId, params);
+    public ResponseEntity<?> getPostParentComments(@PathVariable("id") Long postId, @RequestParam Map<String, String> params) {
+        return commentHelper.getPostParentComments(postId, params);
+    }
+
+    @GetMapping("/comments/{commentId}/status/{status}")
+    public ResponseEntity<?> updateCommentStatus(@PathVariable("commentId") Long commentId, @PathVariable("status") Integer status) {
+        return commentHelper.updateCommentStatus(commentId, status);
+    }
+
+    /**
+     * get current user comments on post
+     *
+     * @param postId
+     * @return
+     */
+    @GetMapping("/posts/{postId}/comments/me")
+    public ResponseEntity<?> getCurrentUserPostComments(@PathVariable("postId") Long postId) {
+        return commentHelper.getCurrentUserPostComments(postId);
     }
 
     @GetMapping("/comments/{commentId}")
@@ -125,7 +146,7 @@ public class MemberController {
      */
     @PostMapping("/posts/reactions")
     public ResponseEntity<?> postReaction(@RequestBody @Valid ReactionRequest reactionRequest) {
-        return postReactionHelper.savePostReaction( reactionRequest);
+        return postReactionHelper.savePostReaction(reactionRequest);
     }
 
     @GetMapping("/posts/{postId}/reactions")

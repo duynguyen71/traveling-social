@@ -21,12 +21,13 @@ public class FollowService {
         return followRepo.saveAndFlush(follow);
     }
 
-    public List<Follow> getFollowers(User user) {
-        return followRepo.findByUser(user);
+    public List<Follow> getFollowers(Long userId,Pageable pageable) {
+        return followRepo.getFollowerNative(userId,pageable);
     }
 
-    public List<Follow> getFollowingUsers(User user, int active) {
-        return followRepo.findByFollowerAndActive(user,active);
+    public List<Follow> getFollowingUsers(Long userId,Pageable pageable) {
+        return followRepo.getFollowingNative(userId,pageable);
+
     }
     public int countFollowers(User user,int active) {
         return followRepo.countByUserAndActive(user,active);

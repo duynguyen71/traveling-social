@@ -5,6 +5,8 @@ import com.tv.tvapi.model.Post;
 import com.tv.tvapi.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,10 +19,19 @@ public interface PostCommentRepository extends JpaRepository<PostComment, Long> 
 
     List<PostComment> findByPost(Post post);
 
-//    List<PostComment> findByPostAndStatus(Post post, Integer status, Pageable pageable);
+    List<PostComment> findByPostAndUserAndStatusAndParentIsNull(Post post,User user,Integer status);
 
-//    List<PostComment> findByPostAndStatusAndParentIsNull(Post post, Integer status);
+    @Query(
+            nativeQuery = true,
+            value = "SELECT * FROM post_comment pc \n" +
+                    "JOIN post p \n" +
+                    "ON pc.post_id = p.id \n" +
+                    "WHERE post_id = :postId \n" +
+                    "AND pc.parent_comment_id IS NULL \n" +
+                    "AND pc.status = :status \n"
+    )
+    List<PostComment> getPostCommentsNative(@Param("postId") Long postId, @Param("status") Integer status, Pageable pageable);
 
-    List<PostComment> findByPostAndParentIsNull(Post post, Pageable pageable);
 
+    Integer countByPostAndStatus(Post post,Integer status);
 }

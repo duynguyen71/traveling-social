@@ -26,6 +26,12 @@ public class BaseResponse {
         baseResponse.setStatusText(HttpStatus.OK.name());
         baseResponse.setMessage(message);
         return ResponseEntity.ok(baseResponse);
+    } public static ResponseEntity<BaseResponse> success(String message) {
+        BaseResponse baseResponse = new BaseResponse();
+        baseResponse.setStatus(HttpStatus.OK.value());
+        baseResponse.setStatusText(HttpStatus.OK.name());
+        baseResponse.setMessage(message);
+        return ResponseEntity.ok(baseResponse);
     }
 
     public static ResponseEntity<?> conflict(String message){
