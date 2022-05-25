@@ -1,8 +1,6 @@
 package com.tv.tvapi.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -11,9 +9,10 @@ import java.util.Date;
 
 @Entity
 @Table(name = "follow")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class Follow {
 
     @Id

@@ -1,8 +1,6 @@
 package com.tv.tvapi.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -11,9 +9,10 @@ import java.util.*;
 
 @Table(name = "file_upload")
 @Entity
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class FileUpload {
 
     @Id
@@ -35,8 +34,8 @@ public class FileUpload {
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(updatable = false, name = "upload_date")
-    private Date uploadDate;
+    @Column(updatable = false, name = "create_date")
+    private Date createDate;
 
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -49,12 +48,16 @@ public class FileUpload {
     @JoinColumn(name = "upload_by")
     private User uploadBy;
 
-
     @OneToMany(mappedBy = "attachment", fetch = FetchType.LAZY)
     private List<PostContent> postContents = new ArrayList<>();
 
     @OneToMany(mappedBy = "attachment", fetch = FetchType.LAZY)
     private List<PostComment> postComments = new ArrayList<>();
 
+    @ManyToMany(mappedBy = "photos")
+    private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "coverPhoto")
+    private List<Review> reviewCoverPhotos = new ArrayList<>();
 
 }

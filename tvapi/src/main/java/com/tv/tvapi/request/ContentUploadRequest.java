@@ -16,4 +16,6 @@ public class ContentUploadRequest {
     private Integer status = 1;
 
     private Integer active = 1;
+
+    private AttachmentRequest attachment;
 }

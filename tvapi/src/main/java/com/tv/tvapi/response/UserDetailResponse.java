@@ -2,6 +2,8 @@ package com.tv.tvapi.response;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class UserDetailResponse {
 
@@ -18,4 +20,12 @@ public class UserDetailResponse {
     private int followerCounts;
 
     private int followingCounts;
+
+    private String bio;
+
+    private String background;
+
+    private Date createDate;
+
+
 }

@@ -1,20 +1,18 @@
 package com.tv.tvapi.model;
 
 import com.tv.tvapi.enumm.ERole;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "role")
+@Getter
+@Setter
 public class Role {
 
     @Id

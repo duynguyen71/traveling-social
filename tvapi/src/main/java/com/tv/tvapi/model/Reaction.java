@@ -23,7 +23,6 @@ public class Reaction {
     @Enumerated(EnumType.ORDINAL)
     private EReactionType type;
 
-
     @OneToMany(mappedBy = "reaction",fetch = FetchType.LAZY)
     private List<PostReaction> posts = new ArrayList<>();
 

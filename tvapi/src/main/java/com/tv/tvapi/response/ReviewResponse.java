@@ -5,19 +5,16 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class CommentResponse {
+public class ReviewResponse {
 
     private Long id;
 
-    private String content;
+    private String title;
 
-    private FileUploadResponse attachment;
+    private FileUploadResponse coverPhoto;
 
     private UserInfoResponse user;
 
     private Date createDate;
-
-    private Integer replyCount;
-
 
 }

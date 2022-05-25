@@ -18,13 +18,17 @@ public class PostService {
     private final PostContentRepository postMediaFileRepo;
     private final PostCommentRepository postCommentRepo;
 
-    public Post getCurrentUserPost(Long postId, Long userId) {
-        return postRepository.findByIdAndUser_Id(postId, userId).orElse(null);
+    public Post getCurrentUserPost(Long postId, User u) {
+        return postRepository.findByIdAndUser(postId, u).orElse(null);
     }
 
 
-    public Post savePost(Post post) {
+    public Post savePostAndFlush(Post post) {
         return postRepository.saveAndFlush(post);
+    }
+
+    public Post save(Post post) {
+        return postRepository.save(post);
     }
 
     public PostContent savePostContent(PostContent postContent) {
@@ -43,8 +47,8 @@ public class PostService {
         return postRepository.findById(postId).orElse(null);
     }
 
-    public List<Post> getUserPost(User user, Pageable pageable, int active, int status) {
-        return postRepository.getUserPostNative(user.getId(), active, status, pageable);
+    public List<Post> getPosts(User user, Pageable pageable) {
+        return postRepository.getPostsNative(user.getId(), pageable);
     }
 
     public List<Post> getUserStories(User user, Pageable pageable) {

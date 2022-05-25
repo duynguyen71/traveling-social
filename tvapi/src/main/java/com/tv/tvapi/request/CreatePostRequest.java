@@ -19,13 +19,9 @@ public class CreatePostRequest {
 
     private Integer status = 1;
 
-    private Integer active = 1;
-
     @Enumerated(EnumType.ORDINAL)
     private EPostType type ;
 
-
     private List<ContentUploadRequest> contents = new LinkedList<>();
-
 
 }

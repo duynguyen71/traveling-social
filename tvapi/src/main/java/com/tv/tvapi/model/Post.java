@@ -12,7 +12,8 @@ import java.util.*;
 @Table(name = "post")
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 public class Post {
 
     @Id
@@ -48,7 +49,7 @@ public class Post {
     private Integer status;
 
     @OneToMany(mappedBy = "post")
-    private List<PostReaction> reactions  = new ArrayList<>();
+    private List<PostReaction> reactions = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
     private List<PostComment> postComments = new ArrayList<>();

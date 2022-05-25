@@ -123,6 +123,19 @@ public class UserHelper {
         }
     }
 
+    public ResponseEntity<?> updateBackground(MultipartFile file) {
+        try {
+            FileUploadResponse fileUploadResponse = fileStorageService.saveImage(file);
+            //save user avt
+            User user = userService.getCurrentUser();
+            user.setBackground(fileUploadResponse.getName());
+            userService.save(user);
+            return BaseResponse.success(fileUploadResponse, "Update background success!");
+        } catch (FileUploadException e) {
+            return BaseResponse.badRequest(e.getMessage());
+        }
+    }
+
     public ResponseEntity<?> getImage(String fileName) {
         //check file upload info exist in db
         FileUpload fileUpload = fileStorageService.getFileUpload(fileName);
@@ -260,4 +273,11 @@ public class UserHelper {
     }
 
 
+    public ResponseEntity<?> getUserProfile(Long userId) {
+        User user = userService.getById(userId, 1);
+        if (user == null)
+            return BaseResponse.badRequest("Can not find user with id: " + userId);
+        UserInfoResponse userInfoResponse = modelMapper.map(user, UserInfoResponse.class);
+        return BaseResponse.success(userInfoResponse, "Get user with id: " + userId + " success");
+    }
 }

@@ -20,6 +20,7 @@ public class MemberController {
     private final FileUploadHelper fileUploadHelper;
     private final CommentHelper commentHelper;
     private final PostReactionHelper postReactionHelper;
+    private final ReviewHelper reviewHelper;
 
     @GetMapping("/users/me/files/{name}")
     public ResponseEntity<?> findFile(@PathVariable("name") String fileName) {
@@ -36,9 +37,19 @@ public class MemberController {
         return userHelper.searchingUsers(params);
     }
 
-    @PostMapping("/users/me/avt")
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<?> getUserInfo(@PathVariable("userId") Long userId) {
+        return userHelper.getUserProfile(userId);
+    }
+
+    @PutMapping("/users/me/avt")
     public ResponseEntity<?> uploadAvt(@RequestParam("file") MultipartFile file) {
         return userHelper.updateAvt(file);
+    }
+
+    @PutMapping("/users/me/background")
+    public ResponseEntity<?> updateBackground(@RequestParam("file") MultipartFile file) {
+        return userHelper.updateBackground(file);
     }
 
     @GetMapping("/users/me")
@@ -56,12 +67,15 @@ public class MemberController {
         return postHelper.getCurrentUserPosts(params);
     }
 
-    @PutMapping("/users/me/posts/{postId}/status/{status}")
+    @PutMapping("/posts/{postId}/status/{status}")
     public ResponseEntity<?> updatePostStatus(@PathVariable("postId") Long postId, @PathVariable("status") Integer status) {
         return postHelper.updateStatus(postId, status);
     }
 
-    @GetMapping("/posts")
+    @GetMapping(value = "/posts"
+//            ,
+//            produces = "application/json;charset=UTF-8"
+    )
     public ResponseEntity<?> getPosts(@RequestParam Map<String, String> params) {
         return postHelper.getPosts(params);
     }
@@ -115,10 +129,10 @@ public class MemberController {
 
     @GetMapping("/posts/{id}/comments")
     public ResponseEntity<?> getPostParentComments(@PathVariable("id") Long postId, @RequestParam Map<String, String> params) {
-        return commentHelper.getPostParentComments(postId, params);
+        return commentHelper.getRootComments(postId, params);
     }
 
-    @GetMapping("/comments/{commentId}/status/{status}")
+    @PutMapping("/comments/{commentId}/status/{status}")
     public ResponseEntity<?> updateCommentStatus(@PathVariable("commentId") Long commentId, @PathVariable("status") Integer status) {
         return commentHelper.updateCommentStatus(commentId, status);
     }
@@ -134,9 +148,9 @@ public class MemberController {
         return commentHelper.getCurrentUserPostComments(postId);
     }
 
-    @GetMapping("/comments/{commentId}")
-    public ResponseEntity<?> getComment(@PathVariable("commentId") Long commentId, @RequestParam Map<String, String> params) {
-        return commentHelper.getComment(commentId, params);
+    @GetMapping("/comments/{commentId}/reply")
+    public ResponseEntity<?> getReplyComments(@PathVariable("commentId") Long commentId, @RequestParam Map<String, String> params) {
+        return commentHelper.getReplyComments(commentId, params);
     }
 
     /**
@@ -153,5 +167,32 @@ public class MemberController {
     public ResponseEntity<?> getPostReactions(@PathVariable("postId") Long postId) {
         return postReactionHelper.getPostReactions(postId);
     }
+
+    //get current user review posts
+    @GetMapping("/users/me/reviews")
+    public ResponseEntity<?> getCurrentUserReviewPosts(@RequestParam Map<String, String> param) {
+        return reviewHelper.getCurrentUserReviewPosts(param);
+    }
+
+    @GetMapping("/users/{userId}/reviews")
+    public ResponseEntity<?> getCurrentUserReviewPosts(@RequestParam Map<String, String> param, @PathVariable("userId") Long userId) {
+        return reviewHelper.getUserReviewPosts(userId, param);
+    }
+
+    @GetMapping("/reviews")
+    public ResponseEntity<?> getReviewPosts(@RequestParam Map<String, String> param) {
+        return reviewHelper.getReviewPosts(param);
+    }
+
+    @PostMapping("/reviews")
+    public ResponseEntity<?> saveReview(@RequestBody @Valid ReviewRequest request) {
+        return reviewHelper.saveReview(request);
+    }
+
+    @GetMapping("/reviews/{reviewId}")
+    public ResponseEntity<?> getReviewPostDetail(@PathVariable("reviewId") Long reviewId) {
+        return reviewHelper.getReviewPostDetail(reviewId);
+    }
+
 
 }

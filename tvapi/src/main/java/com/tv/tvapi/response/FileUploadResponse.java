@@ -13,7 +13,7 @@ public class FileUploadResponse {
 
     private String contentType;
 
-    private Date uploadDate;
+    private Date createDate;
 
 
 }

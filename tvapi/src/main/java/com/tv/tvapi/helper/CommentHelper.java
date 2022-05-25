@@ -8,6 +8,7 @@ import com.tv.tvapi.request.BaseParamRequest;
 import com.tv.tvapi.request.PostCommentRequest;
 import com.tv.tvapi.response.BaseResponse;
 import com.tv.tvapi.response.CommentResponse;
+import com.tv.tvapi.response.UserInfoResponse;
 import com.tv.tvapi.service.FileStorageService;
 import com.tv.tvapi.service.PostCommentService;
 import com.tv.tvapi.service.PostService;
@@ -28,17 +29,19 @@ public class CommentHelper {
 
     private final UserService userService;
     private final PostService postService;
-    private final PostCommentService postCommentService;
+    private final PostCommentService commentService;
     private final ModelMapper modelMapper;
     private final FileStorageService fileStorageService;
 
-    public ResponseEntity<?> getPostParentComments(Long postId, Map<String, String> params) {
+    public ResponseEntity<?> getRootComments(Long postId, Map<String, String> params) {
         BaseParamRequest paramRequest = new BaseParamRequest(params);
         Pageable pageable = paramRequest.toPageRequest();
-        List<PostComment> postComments = postCommentService.getPostParentComments(postId, 1, pageable);
+        List<PostComment> postComments = commentService.getPostParentComments(postId, 1, pageable);
         List<CommentResponse> rs = postComments.stream()
                 .map(comment -> {
                     CommentResponse commentResp = modelMapper.map(comment, CommentResponse.class);
+                    commentResp.setReplyCount(commentService.countReply(comment));
+                    commentResp.setUser(modelMapper.map(comment.getUser(), UserInfoResponse.class));
                     return commentResp;
                 }).collect(Collectors.toList());
         return BaseResponse.success(rs, "Get post comments success!");
@@ -56,7 +59,7 @@ public class CommentHelper {
             PostComment postComment;
             User currentUser = userService.getCurrentUser();
             if (commentReqId != null
-                    && (postComment = postCommentService.getByIdAndUser(commentReqId, currentUser)) != null) {
+                    && (postComment = commentService.getByIdAndUser(commentReqId, currentUser)) != null) {
                 //update comment
             } else {
                 postComment = new PostComment();
@@ -67,8 +70,8 @@ public class CommentHelper {
             postComment.setStatus(1);
             //
             Long parentCommentId = request.getParentCommentId();
-            PostComment parentComment = postCommentService.getById(parentCommentId);
-            if (parentCommentId != null && parentComment != null)
+            PostComment parentComment = null;
+            if (parentCommentId != null && (parentComment = commentService.getById(parentCommentId)) != null)
                 postComment.setParent(parentComment);
             //attachment
             if (attachmentId != null) {
@@ -77,35 +80,50 @@ public class CommentHelper {
                 if (fileUpload != null)
                     postComment.setAttachment(fileUpload);
             }
-            postComment = postCommentService.save(postComment);
-            return BaseResponse.success(modelMapper.map(postComment, CommentResponse.class), "Post comment success");
+            postComment = commentService.save(postComment);
+            CommentResponse commentResponse = modelMapper.map(postComment, CommentResponse.class);
+            commentResponse.setUser(modelMapper.map(postComment.getUser(), UserInfoResponse.class));
+            return BaseResponse.success(commentResponse, "Post comment success");
+
 
         }
         return BaseResponse.badRequest("Can not find post with id: " + id);
     }
 
-    public ResponseEntity<?> getComment(Long commentId, Map<String, String> params) {
-
-        return null;
+    public ResponseEntity<?> getReplyComments(Long commentId, Map<String, String> params) {
+        PostComment parent = commentService.getByIdAndStatus(commentId, 1);
+        List<PostComment> comments = commentService.getReplyComments(parent);
+        List<CommentResponse> rs = comments.stream()
+                .map(comment -> {
+                    CommentResponse commentResp = modelMapper.map(comment, CommentResponse.class);
+                    commentResp.setReplyCount(commentService.countReply(comment));
+                    commentResp.setUser(modelMapper.map(comment.getUser(), UserInfoResponse.class));
+                    return commentResp;
+                }).collect(Collectors.toList());
+        return BaseResponse.success(rs, "get reply comments success");
     }
 
     public ResponseEntity<?> getCurrentUserPostComments(Long postId) {
         User currentUser = userService.getCurrentUser();
-        List<PostComment> comments = postCommentService.getCurrentUserPostComments(postService.getById(postId), currentUser, 1);
+        List<PostComment> comments = commentService.getCurrentUserPostComments(postService.getById(postId), currentUser, 1);
         List<CommentResponse> rs = comments.stream()
-                .map(c -> modelMapper.map(c, CommentResponse.class))
+                .map(c -> {
+                    CommentResponse commentResponse = modelMapper.map(c, CommentResponse.class);
+                    commentResponse.setReplyCount(commentService.countReply(c));
+                    return commentResponse;
+                })
                 .collect(Collectors.toList());
         return BaseResponse.success(rs, "get current user post comments success!");
     }
 
-    public  ResponseEntity<?> updateCommentStatus(Long commentId,Integer status){
+    public ResponseEntity<?> updateCommentStatus(Long commentId, Integer status) {
         User user = userService.getCurrentUser();
-        PostComment comment = postCommentService.getByIdAndUser(commentId, user);
-        if(comment!=null){
+        PostComment comment = commentService.getByIdAndUser(commentId, user);
+        if (comment != null) {
             comment.setStatus(status);
-            postCommentService.save(comment);
+            commentService.save(comment);
             return BaseResponse.success("update comment status success");
         }
-        return BaseResponse.badRequest("Could not find comment with id: "+commentId);
+        return BaseResponse.badRequest("Could not find comment with id: " + commentId);
     }
 }

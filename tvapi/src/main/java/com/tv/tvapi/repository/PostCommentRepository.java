@@ -19,7 +19,7 @@ public interface PostCommentRepository extends JpaRepository<PostComment, Long> 
 
     List<PostComment> findByPost(Post post);
 
-    List<PostComment> findByPostAndUserAndStatusAndParentIsNull(Post post,User user,Integer status);
+    List<PostComment> findByPostAndUserAndStatusAndParentIsNull(Post post, User user, Integer status);
 
     @Query(
             nativeQuery = true,
@@ -32,6 +32,13 @@ public interface PostCommentRepository extends JpaRepository<PostComment, Long> 
     )
     List<PostComment> getPostCommentsNative(@Param("postId") Long postId, @Param("status") Integer status, Pageable pageable);
 
+    List<PostComment> getByParentAndStatus( PostComment parent,Integer status);
 
-    Integer countByPostAndStatus(Post post,Integer status);
+    Integer countByPostAndStatusAndParentIsNull(Post post, Integer status);
+
+    Integer countByPostAndStatus(Post post, Integer status);
+
+    Integer countByParentAndStatus(PostComment parent,Integer status);
+
+    Optional<PostComment> findByIdAndStatus(Long id, Integer status);
 }

@@ -14,4 +14,8 @@ public class UserInfoResponse {
     private String avt;
 
     private String email;
+
+    private String bio;
+
+    private String background;
 }

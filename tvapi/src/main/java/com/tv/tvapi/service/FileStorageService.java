@@ -117,7 +117,7 @@ public class FileStorageService {
             fileUploadResponse.setName(modifiedName);
             fileUploadResponse.setContentType(contentType);
             fileUploadResponse.setId(fileUpload.getId());
-            fileUploadResponse.setUploadDate(fileUpload.getUploadDate());
+            fileUploadResponse.setCreateDate(fileUpload.getCreateDate());
             return fileUploadResponse;
         }
         throw new FileUploadException("File is not valid");
@@ -141,5 +141,9 @@ public class FileStorageService {
 
     public FileUpload getById(Long id) {
         return fileUploadRepo.findById(id).orElse(null);
+    }
+
+    public FileUpload getByName(String name) {
+        return fileUploadRepo.findByName(name).orElse(null);
     }
 }

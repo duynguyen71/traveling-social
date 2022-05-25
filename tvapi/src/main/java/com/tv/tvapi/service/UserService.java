@@ -30,6 +30,10 @@ public class UserService {
         return userRepo.findById(id).orElse(null);
     }
 
+    public User getById(Long id, Integer status) {
+        return userRepo.findByIdAndStatus(id, status).orElse(null);
+    }
+
     public User getCurrentUser() {
         MyUserDetail myUserDetail = (MyUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return getById(myUserDetail.getId());
@@ -55,8 +59,8 @@ public class UserService {
         return code;
     }
 
-    public List<User> search(String username, String fullName, String phone, String email,int active, Pageable pageable) {
-        return userRepo.searchUsersNative(username, fullName, phone, email,active, pageable);
+    public List<User> search(String username, String fullName, String phone, String email, int active, Pageable pageable) {
+        return userRepo.searchUsersNative(username, fullName, phone, email, active, pageable);
     }
 
     public User getByCode(String code) {

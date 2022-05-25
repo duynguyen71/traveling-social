@@ -7,12 +7,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.util.*;
 
+@Entity
 @Table(name = "user")
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Entity
+@Getter
+@Setter
 public class User {
 
     @Id
@@ -36,6 +36,10 @@ public class User {
     private int active;
 
     private int status;
+
+    private String bio;
+
+    private String background;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
@@ -83,7 +87,10 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<PostComment> postComments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<PostReaction> postReactions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private Collection<Review> reviews = new ArrayList<>();
 
 }

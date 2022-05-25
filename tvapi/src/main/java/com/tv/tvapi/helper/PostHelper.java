@@ -1,6 +1,7 @@
 package com.tv.tvapi.helper;
 
 import com.tv.tvapi.model.*;
+import com.tv.tvapi.request.AttachmentRequest;
 import com.tv.tvapi.request.BaseParamRequest;
 import com.tv.tvapi.request.CreatePostRequest;
 import com.tv.tvapi.request.ContentUploadRequest;
@@ -47,13 +48,76 @@ public class PostHelper {
                     //lay ra so luong reactions
                     Long reactionCount = postReactionService.countReactions(post);
                     postResponse.setReactionCount(reactionCount);
-
+//
+                    //get current user reaction on post
+                    PostReaction postReaction = postReactionService.getByUser(currentUser, post, 1);
+                    if (postReaction != null)
+                        postResponse.setMyReaction(modelMapper.map(postReaction.getReaction(), ReactionResponse.class));
                     return postResponse;
                 }).collect(Collectors.toList());
 
         return BaseResponse.success(rs, "get user id: " + currentUser.getId() + "\'s posts success!");
     }
 
+    //    public ResponseEntity<?> createPost(CreatePostRequest createPostRequest) {
+//        User currentUser = userService.getCurrentUser();
+//        String postCaption = createPostRequest.getCaption();
+//        Long postRequestId = createPostRequest.getId();
+//        List<ContentUploadRequest> contents =
+//                createPostRequest.getContents();
+//        String messageResponse = "create post success";
+//        Post post;
+//        if (postRequestId != null && (post = postService.getById(postRequestId)) != null) {
+//            messageResponse = "update post success";
+//        } else {
+//            post = new Post();
+//            post.setUser(currentUser);
+//        }
+//        post.setCaption(postCaption);
+//        post.setStatus(createPostRequest.getStatus());
+//        post.setType(createPostRequest.getType());
+//
+//        post = postService.savePost(post);
+//
+//        for (int i = 0; i < contents.size(); i++) {
+//            ContentUploadRequest postContentRequest = contents.get(i);
+//            Long postContentId = postContentRequest.getId();
+//            FileUpload fileUpload;
+//            if ((fileUpload = fileStorageService.getById(postContentRequest.getAttachmentId())) != null) {
+//                PostContent postContent;
+//                Integer pos = postContentRequest.getPos();
+//                if (postContentId != null &&
+//                        (postContent = postService.getPostMediaFile(postContentId, post)) != null) {
+//                } else {
+//                    postContent = new PostContent();/
+//                    postContent.setPost(post);
+//                    postContent.setAttachment(fileUpload);
+//                }
+//                postContent.setActive(postContentRequest.getActive());
+//                postContent.setCaption(postContentRequest.getCaption());
+//                postContent.setPos(pos != null ? pos : i);
+//                postService.savePostContent(postContent);
+//            }
+//        }
+//        //map to post response
+//        PostResponse postResponse = modelMapper.map(post, PostResponse.class);
+//        postResponse.setUser(modelMapper.map(currentUser, UserInfoResponse.class));
+//        //get contents
+//        List<PostContent> postContents = postService.getPostContents(post);
+//        postResponse.setContents(
+//                postContents.stream()
+//                        .map(postContent -> {
+//                            PostContentResponse postContentResponse = modelMapper.map(postContent, PostContentResponse.class);
+//                            FileUploadResponse map = modelMapper.map(postContent.getAttachment(), FileUploadResponse.class);
+//                            postContentResponse.setAttachment(map);
+//                            return postContentResponse;
+//                        })
+//                        .collect(Collectors.toList())
+//        );
+//
+//
+//        return BaseResponse.success(postResponse, messageResponse);
+//    }
     public ResponseEntity<?> createPost(CreatePostRequest createPostRequest) {
         User currentUser = userService.getCurrentUser();
         String postCaption = createPostRequest.getCaption();
@@ -69,19 +133,29 @@ public class PostHelper {
             post.setUser(currentUser);
         }
         post.setCaption(postCaption);
-        post.setStatus(createPostRequest.getStatus());
-        post.setActive(createPostRequest.getActive());
+        post.setStatus(1);
         post.setType(createPostRequest.getType());
 
-        post = postService.savePost(post);
+        post = postService.savePostAndFlush(post);
 
         for (int i = 0; i < contents.size(); i++) {
-            ContentUploadRequest postContentRequest = contents.get(i);
-            Long postContentId = postContentRequest.getId();
-            FileUpload fileUpload;
-            if ((fileUpload = fileStorageService.getById(postContentRequest.getAttachmentId())) != null) {
+            ContentUploadRequest contentRequest = contents.get(i);
+            Long postContentId = contentRequest.getId();
+            AttachmentRequest attachmentRequest = contentRequest.getAttachment();
+            if (attachmentRequest != null) {
+                FileUpload fileUpload;
+                if (attachmentRequest.getId() != null) {
+                    fileUpload = fileStorageService.getById(attachmentRequest.getId());
+                } else if (attachmentRequest.getName() != null) {
+                    fileUpload = fileStorageService.getByName(attachmentRequest.getName());
+                } else {
+                    continue;
+                }
+                if (fileUpload == null) {
+                    continue;
+                }
                 PostContent postContent;
-                Integer pos = postContentRequest.getPos();
+                Integer pos = contentRequest.getPos();
                 if (postContentId != null &&
                         (postContent = postService.getPostMediaFile(postContentId, post)) != null) {
                 } else {
@@ -89,8 +163,9 @@ public class PostHelper {
                     postContent.setPost(post);
                     postContent.setAttachment(fileUpload);
                 }
-                postContent.setActive(postContentRequest.getActive());
-                postContent.setCaption(postContentRequest.getCaption());
+                postContent.setActive(contentRequest.getActive());
+                postContent.setCaption(contentRequest.getCaption());
+                postContent.setStatus(1);
                 postContent.setPos(pos != null ? pos : i);
                 postService.savePostContent(postContent);
             }
@@ -157,13 +232,13 @@ public class PostHelper {
         BaseParamRequest baseParamRequest = new BaseParamRequest(params);
 
         Pageable pageable = baseParamRequest.toPageRequest();
-        List<Post> posts = postService.getUserPost(currentUser, pageable, 1, 1);
+        List<Post> posts = postService.getPosts(currentUser, pageable);
 
         List<PostResponse> data = posts.stream()
                 .map(post -> {
                     PostResponse postResponse = modelMapper.map(post, PostResponse.class);
                     postResponse.setReactionCount(postReactionService.countReactions(post));
-                    postResponse.setCommentCount(postCommentService.countCommentsOnPost(post));
+                    postResponse.setCommentCount(postCommentService.countAllComments(post));
                     //get current user reaction on post
                     PostReaction postReaction = postReactionService.getByUser(currentUser, post, 1);
                     if (postReaction != null)
@@ -182,6 +257,7 @@ public class PostHelper {
                                         if (modelMapper.getTypeMap(PostComment.class, CommentResponse.class) == null)
                                             modelMapper.addMappings(clientPropertyMap);
                                         CommentResponse commentResponse = modelMapper.map(c, CommentResponse.class);
+                                        commentResponse.setReplyCount(postCommentService.countReply(c));
                                         return commentResponse;
                                     })
                                     .collect(Collectors.toList())
@@ -207,10 +283,10 @@ public class PostHelper {
 
 
     public ResponseEntity<?> updateStatus(Long postId, Integer status) {
-        Post post = postService.getCurrentUserPost(userService.getCurrentUser().getId(), postId);
+        Post post = postService.getCurrentUserPost(postId, userService.getCurrentUser());
         if (post != null) {
             post.setStatus(status);
-            postService.savePost(post);
+            postService.save(post);
             return BaseResponse.success("update post " + post + " status success!");
         }
         return BaseResponse.badRequest("could not find post with id: " + postId);

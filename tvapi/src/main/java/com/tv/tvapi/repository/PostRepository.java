@@ -17,19 +17,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByUser(User user);
 
-    Optional<Post> findByIdAndUser_Id(Long postId, Long userId);
+    Optional<Post> findByIdAndUser(Long postId, User u);
 
-    @Query(
-            nativeQuery = true,
-            value = "SELECT p.* FROM post p JOIN user u " +
-                    "ON p.user_id = u.id " +
-                    "WHERE p.user_id=:userId AND  p.active =:active AND p.status =:status AND p.type =1 "
-    )
-    List<Post> getUserPostNative(@Param("userId") Long userId,
-                                 @Param("active") Integer active,
-                                 @Param("status") Integer status,
-                                 Pageable pageable
-    );
 
     @Query(
             nativeQuery = true,
@@ -57,17 +46,22 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                     "WHERE u.id = :userId AND f.status =1 \n" +
                     "UNION SELECT :userId) \n" +
                     "AND p.create_date > SUBDATE(NOW(),INTERVAL 1000 HOUR)\n" +
-                    "AND p.type = 0"
+                    "AND p.type = 0 AND p.status=1"
     )
     List<Post> getUserStoriesNative(@Param("userId") Long userId, Pageable pageable);
 
-
     @Query(
             nativeQuery = true,
-            value = "SELECT * FROM post p\n" +
-                    "WHERE p.type = 1"
+            value = "SELECT p.* FROM post p \n" +
+                    "JOIN user u ON p.user_id = u.id\n" +
+                    "WHERE  p.user_id \n" +
+                    "IN (SELECT f.user_id FROM user u \n" +
+                    "JOIN follow f ON u.id = f.follower_id \n" +
+                    "WHERE u.id = :userId AND f.status =1 \n" +
+                    "UNION SELECT :userId) \n" +
+                    "AND p.type = 1 AND p.status=1"
     )
-    List<Post> getPostsNative(Pageable pageable);
+    List<Post> getPostsNative(@Param("userId") Long userId, Pageable pageable);
 
 
 }
