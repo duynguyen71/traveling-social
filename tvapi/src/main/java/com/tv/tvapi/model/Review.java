@@ -57,4 +57,8 @@ public class Review {
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateDate;
+
+    @OneToMany(mappedBy = "review")
+    private Collection<UserReviewVisit> visitUsers = new HashSet<>();
+
 }

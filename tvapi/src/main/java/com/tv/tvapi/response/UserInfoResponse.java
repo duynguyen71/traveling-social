@@ -18,4 +18,6 @@ public class UserInfoResponse {
     private String bio;
 
     private String background;
+
+    private Boolean isFollowed = false;
 }

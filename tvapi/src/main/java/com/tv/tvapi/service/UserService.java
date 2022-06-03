@@ -3,7 +3,6 @@ package com.tv.tvapi.service;
 import com.tv.tvapi.model.MyUserDetail;
 import com.tv.tvapi.model.User;
 import com.tv.tvapi.repository.UserRepository;
-import com.tv.tvapi.request.UserSearchParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,8 +29,8 @@ public class UserService {
         return userRepo.findById(id).orElse(null);
     }
 
-    public User getById(Long id, Integer status) {
-        return userRepo.findByIdAndStatus(id, status).orElse(null);
+    public User getById(Long id, Integer active) {
+        return userRepo.findByIdAndActive(id, active).orElse(null);
     }
 
     public User getCurrentUser() {
@@ -65,5 +64,9 @@ public class UserService {
 
     public User getByCode(String code) {
         return userRepo.findByVerificationCode(code).orElse(null);
+    }
+
+    public List<User> getTopActiveUsers(Pageable pageable) {
+        return userRepo.getTopActiveUsers();
     }
 }

@@ -1,5 +1,6 @@
 package com.tv.tvapi.repository;
 
+import com.tv.tvapi.enumm.EPostType;
 import com.tv.tvapi.model.Post;
 import com.tv.tvapi.model.User;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,6 @@ import java.util.Optional;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    List<Post> findByUser(User user);
 
     Optional<Post> findByIdAndUser(Long postId, User u);
 
@@ -63,5 +63,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     )
     List<Post> getPostsNative(@Param("userId") Long userId, Pageable pageable);
 
+
+    @Query(
+            nativeQuery = true,
+            value = "SELECT * FROM post p\n" +
+                    " JOIN user u \n" +
+                    "ON p.user_id = u.id\n" +
+                    "WHERE p.user_id = :userId AND p.type =:type"
+    )
+    List<Post> findByUserAndTypeAndStatus(@Param("userId") Long userId,@Param("type")Integer type, Pageable pageable);
 
 }

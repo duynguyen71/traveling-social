@@ -19,7 +19,7 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
 
     int countByFollowerAndActive(User follower, int active);
 
-    Optional<Follow> findByUserAndFollowerAndActive(User user, User follower, int active);
+    Optional<Follow> findByUserAndFollower(User user, User follower);
 
     @Query(
             nativeQuery = true,
@@ -40,4 +40,7 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
                     "AND f.status = 1"
     )
     List<Follow> getFollowingNative(@Param("userId") Long userId,Pageable pageable);
+
+
+    boolean existsByUserAndFollowerAndStatus(User user,User follower,Integer status);
 }

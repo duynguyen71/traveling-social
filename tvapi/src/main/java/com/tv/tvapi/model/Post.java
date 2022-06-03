@@ -42,6 +42,7 @@ public class Post {
     private User user;
 
     @Enumerated(EnumType.ORDINAL)
+    @Column(name = "type")
     private EPostType type;
 
     private Integer active;

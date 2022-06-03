@@ -95,7 +95,7 @@ public class MemberController {
         return userHelper.getFollowingUsers(param);
     }
 
-    @GetMapping("/users/me/following/{userId}")
+    @GetMapping("/users/me/follow/{userId}")
     public ResponseEntity<?> followRequest(@PathVariable("userId") Long userId) {
         return userHelper.followUser(userId);
     }
@@ -192,6 +192,16 @@ public class MemberController {
     @GetMapping("/reviews/{reviewId}")
     public ResponseEntity<?> getReviewPostDetail(@PathVariable("reviewId") Long reviewId) {
         return reviewHelper.getReviewPostDetail(reviewId);
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<?> getTopActiveUsers(@RequestParam Map<String, String> param) {
+        return userHelper.getTopUsers(param);
+    }
+
+    @GetMapping("/users/{userId}/posts")
+    public ResponseEntity<?> getUserPosts(@PathVariable("userId") Long userId, @RequestParam Map<String, String> param) {
+        return postHelper.getUserPosts(userId, param);
     }
 
 

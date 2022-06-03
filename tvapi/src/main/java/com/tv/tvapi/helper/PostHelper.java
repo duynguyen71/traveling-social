@@ -1,5 +1,6 @@
 package com.tv.tvapi.helper;
 
+import com.tv.tvapi.enumm.EPostType;
 import com.tv.tvapi.model.*;
 import com.tv.tvapi.request.AttachmentRequest;
 import com.tv.tvapi.request.BaseParamRequest;
@@ -10,7 +11,9 @@ import com.tv.tvapi.service.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -59,65 +62,6 @@ public class PostHelper {
         return BaseResponse.success(rs, "get user id: " + currentUser.getId() + "\'s posts success!");
     }
 
-    //    public ResponseEntity<?> createPost(CreatePostRequest createPostRequest) {
-//        User currentUser = userService.getCurrentUser();
-//        String postCaption = createPostRequest.getCaption();
-//        Long postRequestId = createPostRequest.getId();
-//        List<ContentUploadRequest> contents =
-//                createPostRequest.getContents();
-//        String messageResponse = "create post success";
-//        Post post;
-//        if (postRequestId != null && (post = postService.getById(postRequestId)) != null) {
-//            messageResponse = "update post success";
-//        } else {
-//            post = new Post();
-//            post.setUser(currentUser);
-//        }
-//        post.setCaption(postCaption);
-//        post.setStatus(createPostRequest.getStatus());
-//        post.setType(createPostRequest.getType());
-//
-//        post = postService.savePost(post);
-//
-//        for (int i = 0; i < contents.size(); i++) {
-//            ContentUploadRequest postContentRequest = contents.get(i);
-//            Long postContentId = postContentRequest.getId();
-//            FileUpload fileUpload;
-//            if ((fileUpload = fileStorageService.getById(postContentRequest.getAttachmentId())) != null) {
-//                PostContent postContent;
-//                Integer pos = postContentRequest.getPos();
-//                if (postContentId != null &&
-//                        (postContent = postService.getPostMediaFile(postContentId, post)) != null) {
-//                } else {
-//                    postContent = new PostContent();/
-//                    postContent.setPost(post);
-//                    postContent.setAttachment(fileUpload);
-//                }
-//                postContent.setActive(postContentRequest.getActive());
-//                postContent.setCaption(postContentRequest.getCaption());
-//                postContent.setPos(pos != null ? pos : i);
-//                postService.savePostContent(postContent);
-//            }
-//        }
-//        //map to post response
-//        PostResponse postResponse = modelMapper.map(post, PostResponse.class);
-//        postResponse.setUser(modelMapper.map(currentUser, UserInfoResponse.class));
-//        //get contents
-//        List<PostContent> postContents = postService.getPostContents(post);
-//        postResponse.setContents(
-//                postContents.stream()
-//                        .map(postContent -> {
-//                            PostContentResponse postContentResponse = modelMapper.map(postContent, PostContentResponse.class);
-//                            FileUploadResponse map = modelMapper.map(postContent.getAttachment(), FileUploadResponse.class);
-//                            postContentResponse.setAttachment(map);
-//                            return postContentResponse;
-//                        })
-//                        .collect(Collectors.toList())
-//        );
-//
-//
-//        return BaseResponse.success(postResponse, messageResponse);
-//    }
     public ResponseEntity<?> createPost(CreatePostRequest createPostRequest) {
         User currentUser = userService.getCurrentUser();
         String postCaption = createPostRequest.getCaption();
@@ -230,10 +174,8 @@ public class PostHelper {
     public ResponseEntity<?> getPosts(Map<String, String> params) {
         User currentUser = userService.getCurrentUser();
         BaseParamRequest baseParamRequest = new BaseParamRequest(params);
-
         Pageable pageable = baseParamRequest.toPageRequest();
         List<Post> posts = postService.getPosts(currentUser, pageable);
-
         List<PostResponse> data = posts.stream()
                 .map(post -> {
                     PostResponse postResponse = modelMapper.map(post, PostResponse.class);
@@ -290,5 +232,58 @@ public class PostHelper {
             return BaseResponse.success("update post " + post + " status success!");
         }
         return BaseResponse.badRequest("could not find post with id: " + postId);
+    }
+
+    public ResponseEntity<?> getUserPosts(Long userId, Map<String, String> param) {
+        User currentUser = userService.getCurrentUser();
+        BaseParamRequest baseParamRequest = new BaseParamRequest(param);
+        Pageable pageRequest = baseParamRequest.toPageRequest();
+        List<Post> posts = postService.getUserPosts(userId, 1, pageRequest);
+        List<PostResponse> data = posts.stream()
+                .map(post -> {
+                    PostResponse postResponse = modelMapper.map(post, PostResponse.class);
+                    postResponse.setReactionCount(postReactionService.countReactions(post));
+                    postResponse.setCommentCount(postCommentService.countAllComments(post));
+                    //get  currentUser reaction on post
+                    PostReaction postReaction = postReactionService.getByUser(currentUser, post, 1);
+                    if (postReaction != null)
+                        postResponse.setMyReaction(modelMapper.map(postReaction.getReaction(), ReactionResponse.class));
+                    //get current users comments on post
+                    List<PostComment> myComments = postCommentService.getCurrentUserPostComments(post, currentUser, 1);
+                    postResponse.setMyComments(
+                            myComments.stream()
+                                    .map(c -> {
+                                        PropertyMap<PostComment, CommentResponse> clientPropertyMap = new PropertyMap<>() {
+                                            @Override
+                                            protected void configure() {
+                                                skip(destination.getUser());
+                                            }
+                                        };
+                                        if (modelMapper.getTypeMap(PostComment.class, CommentResponse.class) == null)
+                                            modelMapper.addMappings(clientPropertyMap);
+                                        CommentResponse commentResponse = modelMapper.map(c, CommentResponse.class);
+                                        commentResponse.setReplyCount(postCommentService.countReply(c));
+                                        return commentResponse;
+                                    })
+                                    .collect(Collectors.toList())
+                    );
+                    //lay ra noi dung bai post
+                    List<PostContent> postContents = postService.getPostContents(post);
+                    postResponse.setContents(
+                            postContents.stream()
+                                    .map(content -> {
+                                        PostContentResponse postContentResponse = modelMapper.map(content, PostContentResponse.class);
+                                        FileUploadResponse map = modelMapper.map(content.getAttachment(), FileUploadResponse.class);
+                                        postContentResponse.setAttachment(map);
+                                        return postContentResponse;
+                                    })
+                                    .collect(Collectors.toList())
+                    );
+                    return postResponse;
+                })
+                .collect(Collectors.toList());
+
+        return BaseResponse.success(data, "get user id:" + userId + " posts success");
+
     }
 }

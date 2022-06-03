@@ -17,7 +17,7 @@ public class FollowService {
 
     private final FollowRepository followRepo;
 
-    public Follow save(Follow follow){
+    public Follow saveAndFlush(Follow follow){
         return followRepo.saveAndFlush(follow);
     }
 
@@ -37,8 +37,12 @@ public class FollowService {
         return followRepo.countByFollowerAndActive(user,active);
     }
 
-    public Follow getByUserAndFollower(User user,User follower,int active){
-        return followRepo.findByUserAndFollowerAndActive(user, follower, active).orElse(null);
+    public Follow getByUserAndFollower(User user,User follower){
+        return followRepo.findByUserAndFollower(user, follower).orElse(null);
+    }
+
+    public boolean isFollowed(User user,User follower,Integer status){
+        return  followRepo.existsByUserAndFollowerAndStatus(user,follower,status);
     }
 
 }

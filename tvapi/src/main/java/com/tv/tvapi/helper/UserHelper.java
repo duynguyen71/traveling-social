@@ -74,8 +74,13 @@ public class UserHelper {
 
         List<User> users = userService.search(username, fullName, phone, email, 1, pageable);
 
+        User user = userService.getCurrentUser();
         List<UserInfoResponse> data = users.stream()
-                .map(user -> modelMapper.map(user, UserInfoResponse.class))
+                .map(u -> {
+                    UserInfoResponse userInfoResponse = modelMapper.map(u, UserInfoResponse.class);
+                    userInfoResponse.setIsFollowed(followService.isFollowed(u, user, 1));
+                    return userInfoResponse;
+                })
                 .collect(Collectors.toList());
         return BaseResponse.success(data, "Searching users success!");
     }
@@ -240,23 +245,29 @@ public class UserHelper {
     public ResponseEntity<?> followUser(Long userId) {
         User followed = userService.getById(userId);
         User currentUser = userService.getCurrentUser();
-        if (!Objects.equals(currentUser.getId(), userId)
-                && followed != null
-                && followService.getByUserAndFollower(followed, currentUser, 1) == null) {
-            Follow follow = new Follow();
-            follow.setFollower(currentUser);
-            follow.setUser(followed);
-            followService.save(follow);
+        if (!Objects.equals(currentUser.getId(), userId) && followed != null) {
+            Follow follow;
+            if ((follow = followService.getByUserAndFollower(followed, currentUser)) == null) {
+                follow = new Follow();
+                follow.setFollower(currentUser);
+                follow.setUser(followed);
+            }
+            follow.setActive(1);
+            follow.setStatus(1);
+            followService.saveAndFlush(follow);
             return BaseResponse.success(null, "Following user " + userId + " request success!");
         }
         return BaseResponse.badRequest("Can not follow user with id: " + userId);
     }
 
     public ResponseEntity<?> unFollowUser(Long id) {
-        Follow follow = followService.getByUserAndFollower(userService.getById(id), userService.getCurrentUser(), 1);
+        log.info("USER : " + id);
+        log.info("FOLLOWER : " + userService.getCurrentUser().getId());
+        Follow follow = followService.getByUserAndFollower(userService.getById(id), userService.getCurrentUser());
         if (follow != null) {
             follow.setActive(0);
-            followService.save(follow);
+            follow.setStatus(0);
+            followService.saveAndFlush(follow);
             return BaseResponse.success(null, "unfollow user with id: " + id + "  success!");
         }
         return BaseResponse.badRequest("Can not unfollow user with id: " + id);
@@ -277,7 +288,24 @@ public class UserHelper {
         User user = userService.getById(userId, 1);
         if (user == null)
             return BaseResponse.badRequest("Can not find user with id: " + userId);
-        UserInfoResponse userInfoResponse = modelMapper.map(user, UserInfoResponse.class);
+        UserProfileResponse userInfoResponse = modelMapper.map(user, UserProfileResponse.class);
+        int followerCounts = followService.countFollowers(user, 1);
+        int followingCounts = followService.countFollowingUsers(user, 1);
+        userInfoResponse.setFollowerCounts(followerCounts);
+        userInfoResponse.setFollowingCounts(followingCounts);
+        userInfoResponse.setIsFollowed(followService.isFollowed(user, userService.getCurrentUser(), 1));
         return BaseResponse.success(userInfoResponse, "Get user with id: " + userId + " success");
     }
+
+    public ResponseEntity<?> getTopUsers(Map<String, String> param) {
+        Pageable pageable = new BaseParamRequest(param).toPageRequest();
+        List<User> users = userService.getTopActiveUsers(pageable);
+        List<UserInfoResponse> rs = users.stream()
+                .map(u -> modelMapper.map(u, UserInfoResponse.class))
+                .collect(Collectors.toList());
+        return BaseResponse.success(rs, "get top posts users success");
+
+    }
+
+
 }

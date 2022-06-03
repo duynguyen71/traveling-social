@@ -1,5 +1,6 @@
 package com.tv.tvapi.service;
 
+import com.tv.tvapi.enumm.EPostType;
 import com.tv.tvapi.model.*;
 import com.tv.tvapi.repository.PostCommentRepository;
 import com.tv.tvapi.repository.PostContentRepository;
@@ -62,5 +63,10 @@ public class PostService {
     public List<Post> getUserPosts(User user, Integer status, Pageable pageable) {
         return postRepository.getUserPostsNative(user.getId(), status, null, 1, pageable);
     }
+
+    public List<Post> getUserPosts(Long userId,Integer type, Pageable pageable) {
+        return postRepository.findByUserAndTypeAndStatus(userId,type, pageable);
+    }
+
 
 }
