@@ -93,8 +93,14 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Collection<Review> reviews = new ArrayList<>();
 
-
     @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
     private Collection<UserReviewVisit> visitReviewPosts = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Collection<Message> messages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<ChatGroupUser> chatGroupUsers = new HashSet<>();
+
 
 }

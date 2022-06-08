@@ -3,6 +3,8 @@ package com.tv.tvapi.service;
 import com.tv.tvapi.model.MyUserDetail;
 import com.tv.tvapi.model.User;
 import com.tv.tvapi.repository.UserRepository;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class MyUserDetailService implements UserDetailsService {
 
     private final UserRepository userRepo;

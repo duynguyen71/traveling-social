@@ -1,6 +1,5 @@
 package com.tv.tvapi.helper;
 
-import com.tv.tvapi.dto.UserDto;
 import com.tv.tvapi.exception.FileNotFoundException;
 import com.tv.tvapi.exception.FileUploadException;
 import com.tv.tvapi.model.*;
@@ -40,13 +39,6 @@ public class UserHelper {
     private final FollowService followService;
     private final JwtService jwtService;
 
-    public ResponseEntity<?> getUsers() {
-        List<User> users = userService.getUsers();
-        List<UserDto> data = users.stream().map(user ->
-                modelMapper.map(user, UserDto.class)
-        ).collect(Collectors.toList());
-        return ResponseEntity.ok(data);
-    }
 
     public ResponseEntity<?> searchingUsers(Map<String, String> params) {
         BaseParamRequest baseParam = new BaseParamRequest(params);

@@ -150,6 +150,7 @@ public class PostHelper {
     public ResponseEntity<?> getStories(Map<String, String> params) {
         User currentUser = userService.getCurrentUser();
         BaseParamRequest baseParamRequest = new BaseParamRequest(params);
+        baseParamRequest.setSortBy("create_date");
 
         Pageable pageable = baseParamRequest.toPageRequest();
         List<Post> posts = postService.getUserStories(currentUser, pageable);
@@ -174,6 +175,7 @@ public class PostHelper {
     public ResponseEntity<?> getPosts(Map<String, String> params) {
         User currentUser = userService.getCurrentUser();
         BaseParamRequest baseParamRequest = new BaseParamRequest(params);
+        baseParamRequest.setSortBy("create_date");
         Pageable pageable = baseParamRequest.toPageRequest();
         List<Post> posts = postService.getPosts(currentUser, pageable);
         List<PostResponse> data = posts.stream()

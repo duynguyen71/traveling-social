@@ -19,5 +19,5 @@ public class UserInfoResponse {
 
     private String background;
 
-    private Boolean isFollowed = false;
+    private Boolean isFollowed ;
 }

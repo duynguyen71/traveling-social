@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.ws.rs.Path;
 import java.util.Map;
 
 @RestController
@@ -21,6 +22,8 @@ public class MemberController {
     private final CommentHelper commentHelper;
     private final PostReactionHelper postReactionHelper;
     private final ReviewHelper reviewHelper;
+    private final ChatGroupHelper chatGroupHelper;
+    private final MessageHelper messageHelper;
 
     @GetMapping("/users/me/files/{name}")
     public ResponseEntity<?> findFile(@PathVariable("name") String fileName) {
@@ -72,10 +75,7 @@ public class MemberController {
         return postHelper.updateStatus(postId, status);
     }
 
-    @GetMapping(value = "/posts"
-//            ,
-//            produces = "application/json;charset=UTF-8"
-    )
+    @GetMapping(value = "/posts")
     public ResponseEntity<?> getPosts(@RequestParam Map<String, String> params) {
         return postHelper.getPosts(params);
     }
@@ -203,6 +203,35 @@ public class MemberController {
     public ResponseEntity<?> getUserPosts(@PathVariable("userId") Long userId, @RequestParam Map<String, String> param) {
         return postHelper.getUserPosts(userId, param);
     }
+
+    @GetMapping("/users/me/chat-groups")
+    public ResponseEntity<?> getChatGroups(@RequestParam Map<String, String> param) {
+        return chatGroupHelper.getChatGroups(param);
+    }
+
+    @PutMapping("/users/me/messages/{messageId}")
+    public ResponseEntity<?> removeMessage(@PathVariable("messageId") Long messageId) {
+        return messageHelper.removeMessage(messageId);
+    }
+
+    @PostMapping("/users/me/chat-groups")
+    public ResponseEntity<?> createChatGroup(@RequestBody @Valid ChatGroupRequest request) {
+        return chatGroupHelper.createChatGroup(request);
+    }
+
+    @GetMapping("/chat-groups/{groupId}/messages")
+    public ResponseEntity<?> getGroupMessages(@PathVariable("groupId") Long chatGroupId, @RequestParam Map<String, String> param) {
+        return messageHelper.getMessages(chatGroupId, param);
+    }
+
+    @PostMapping("/users/me/chat-groups/{groupId}/messages")
+    public ResponseEntity<?> saveMessage(@PathVariable("groupId") Long chatGroupId, @RequestBody @Valid MessageRequest request) {
+        return messageHelper.saveMessage(chatGroupId, request);
+    }
+//    @PutMapping("/users/me/messages/{id}/status")
+//    public ResponseEntity<?> saveMessage(@PathVariable("id")Long id,  @PathV) {
+//        return messageHelper.saveMessage(chatGroupId, request);
+//    }
 
 
 }

@@ -17,7 +17,7 @@ public class PublicController {
 
     @GetMapping("/users")
     public ResponseEntity<?> getUsers() {
-        return userHelper.getUsers();
+        return null;
     }
 
     @GetMapping("validation-input")

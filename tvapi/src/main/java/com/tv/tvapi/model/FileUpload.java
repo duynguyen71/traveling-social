@@ -60,4 +60,8 @@ public class FileUpload {
     @OneToMany(mappedBy = "coverPhoto")
     private List<Review> reviewCoverPhotos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "fileUpload")
+    private Collection<MessageAttachment> messageAttachments;
+
+
 }

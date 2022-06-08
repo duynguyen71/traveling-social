@@ -1,5 +1,7 @@
 package com.tv.tvapi.config;
 
+import com.tv.tvapi.model.MyUserDetail;
+import com.tv.tvapi.service.MyUserDetailService;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,4 +21,6 @@ public class ApplicationConfiguration {
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+
+
 }
