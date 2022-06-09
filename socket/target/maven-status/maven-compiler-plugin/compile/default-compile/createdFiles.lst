@@ -1,0 +1,6 @@
+com\tv\socket\MessagingStompWebsocketApplication.class
+com\tv\socket\MyUserPrinciple.class
+com\tv\socket\config\WebSocketConfiguration.class
+com\tv\socket\controller\MessageController.class
+com\tv\socket\message\Message.class
+com\tv\socket\config\WebSocketEventListener.class
