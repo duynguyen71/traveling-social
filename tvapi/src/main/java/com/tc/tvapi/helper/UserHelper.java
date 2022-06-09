@@ -1,4 +1,7 @@
 <<<<<<< HEAD:tvapi/src/main/java/com/tc/tvapi/helper/UserHelper.java
+<<<<<<< HEAD:tvapi/src/main/java/com/tc/tvapi/helper/UserHelper.java
+=======
+>>>>>>> ef1177e1ac8996f5cc6a92d240cf7f6813d299e4:tvapi/src/main/java/com/tv/tvapi/helper/UserHelper.java
 package com.tc.tvapi.helper;
 
 import com.tc.tvapi.model.FileUpload;
@@ -12,6 +15,7 @@ import com.tc.tvapi.service.*;
 import com.tc.tvapi.exception.FileNotFoundException;
 import com.tc.tvapi.exception.FileUploadException;
 import com.tc.tvapi.utilities.ValidationUtil;
+<<<<<<< HEAD:tvapi/src/main/java/com/tc/tvapi/helper/UserHelper.java
 =======
 package com.tv.tvapi.helper;
 
@@ -24,6 +28,8 @@ import com.tv.tvapi.response.*;
 import com.tv.tvapi.service.*;
 import com.tv.tvapi.utilities.ValidationUtil;
 >>>>>>> parent of 5a88027 (update multiple modules):tvapi/src/main/java/com/tv/tvapi/helper/UserHelper.java
+=======
+>>>>>>> ef1177e1ac8996f5cc6a92d240cf7f6813d299e4:tvapi/src/main/java/com/tv/tvapi/helper/UserHelper.java
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;

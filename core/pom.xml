@@ -4,7 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>traveling-crew</artifactId>
+<<<<<<< HEAD:core/pom.xml
 <<<<<<< HEAD:batchjob/pom.xml
+=======
+>>>>>>> ef1177e1ac8996f5cc6a92d240cf7f6813d299e4:batchjob/pom.xml
         <groupId>com.tc</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
@@ -12,6 +15,7 @@
     <packaging>jar</packaging>
     <artifactId>batchjob</artifactId>
     <name>batchjob</name>
+<<<<<<< HEAD:core/pom.xml
 =======
         <groupId>org.example</groupId>
         <version>1.0-SNAPSHOT</version>
@@ -20,6 +24,8 @@
 
     <artifactId>core</artifactId>
 >>>>>>> parent of 5a88027 (update multiple modules):core/pom.xml
+=======
+>>>>>>> ef1177e1ac8996f5cc6a92d240cf7f6813d299e4:batchjob/pom.xml
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

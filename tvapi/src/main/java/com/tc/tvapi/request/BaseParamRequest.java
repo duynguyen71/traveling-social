@@ -1,6 +1,9 @@
 package com.tc.tvapi.request;
 
 <<<<<<< HEAD:tvapi/src/main/java/com/tc/tvapi/request/BaseParamRequest.java
+<<<<<<< HEAD:tvapi/src/main/java/com/tc/tvapi/request/BaseParamRequest.java
+=======
+>>>>>>> ef1177e1ac8996f5cc6a92d240cf7f6813d299e4:tvapi/src/main/java/com/tv/tvapi/request/BaseParamRequest.java
 import com.tc.tvapi.utilities.ValidationUtil;
 import lombok.*;
 =======

@@ -5,10 +5,14 @@
     <parent>
         <artifactId>traveling-crew</artifactId>
 <<<<<<< HEAD
+<<<<<<< HEAD
         <groupId>com.tc</groupId>
 =======
         <groupId>org.example</groupId>
 >>>>>>> parent of 5a88027 (update multiple modules)
+=======
+        <groupId>com.tc</groupId>
+>>>>>>> ef1177e1ac8996f5cc6a92d240cf7f6813d299e4
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -16,10 +20,13 @@
     <packaging>jar</packaging>
     <artifactId>tcapi</artifactId>
     <name>tcapi</name>
+<<<<<<< HEAD
 =======
 
     <artifactId>tvapi</artifactId>
 >>>>>>> parent of 5a88027 (update multiple modules)
+=======
+>>>>>>> ef1177e1ac8996f5cc6a92d240cf7f6813d299e4
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

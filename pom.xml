@@ -5,10 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     <groupId>com.tc</groupId>
 =======
     <groupId>org.example</groupId>
 >>>>>>> parent of 5a88027 (update multiple modules)
+=======
+    <groupId>com.tc</groupId>
+>>>>>>> ef1177e1ac8996f5cc6a92d240cf7f6813d299e4
     <artifactId>traveling-crew</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>

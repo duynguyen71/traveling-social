@@ -70,8 +70,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         public CorsFilter corsFilter() {
             UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
             CorsConfiguration config = new CorsConfiguration();
+<<<<<<< HEAD:tvapi/src/main/java/com/tc/tvapi/config/WebSecurityConfig.java
 //            config.setAllowCredentials(true);
             config.addAllowedOrigin("http://localhost:3000");
+=======
+//            com.tv.socket.config.setAllowCredentials(true);
+//            config.addAllowedOrigin("http://localhost:3000");
+            config.addAllowedOrigin("**");
+            config.setAllowCredentials(true);
+>>>>>>> ef1177e1ac8996f5cc6a92d240cf7f6813d299e4:tvapi/src/main/java/com/tv/tvapi/config/WebSecurityConfig.java
             config.addAllowedHeader("*");
             config.addAllowedMethod("POST");
             config.addAllowedMethod("GET");
