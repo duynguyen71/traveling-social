@@ -4,20 +4,23 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.tc</groupId>
+<<<<<<< HEAD
+    <groupId>com.tc</groupId>
+=======
+    <groupId>org.example</groupId>
+>>>>>>> parent of 5a88027 (update multiple modules)
     <artifactId>traveling-crew</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
-
     <modules>
         <module>eureka-server</module>
         <module>tvapi</module>
-        <module>socket</module>
-        <module>batchjob</module>
+        <module>core</module>
     </modules>
 
     <name>travelingcrew</name>
 
+<!--    <url>https://www.amigoscode.com</url>-->
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -59,10 +62,6 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
     </dependencies>
 

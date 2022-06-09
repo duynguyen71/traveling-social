@@ -8,16 +8,16 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="tvapi" />
-        <module name="socket" />
+        <module name="core" />
         <module name="eureka-server" />
-        <module name="batchjob" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="authenticate" target="17" />
+      <module name="batchjob" target="17" />
       <module name="batchjobb" target="17" />
-      <module name="core" target="17" />
       <module name="eureku-server" target="17" />
+      <module name="socket" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -2,16 +2,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <parent>
         <artifactId>traveling-crew</artifactId>
-        <groupId>org.tc</groupId>
+<<<<<<< HEAD
+        <groupId>com.tc</groupId>
+=======
+        <groupId>org.example</groupId>
+>>>>>>> parent of 5a88027 (update multiple modules)
         <version>1.0-SNAPSHOT</version>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
+<<<<<<< HEAD
     <packaging>jar</packaging>
+    <artifactId>tcapi</artifactId>
+    <name>tcapi</name>
+=======
+
     <artifactId>tvapi</artifactId>
+>>>>>>> parent of 5a88027 (update multiple modules)
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -19,7 +27,6 @@
     </properties>
 
     <dependencies>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -54,17 +61,14 @@
             <artifactId>java-jwt</artifactId>
             <version>3.18.1</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-actuator-autoconfigure</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-        </dependency>
-
-
+        <!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-configuration-processor</artifactId>-->
+<!--            <optional>true</optional>-->
+<!--        </dependency>-->
     </dependencies>
 </project>
