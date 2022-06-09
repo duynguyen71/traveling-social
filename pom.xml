@@ -4,15 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <groupId>com.tc</groupId>
-=======
+
     <groupId>org.example</groupId>
->>>>>>> parent of 5a88027 (update multiple modules)
-=======
-    <groupId>com.tc</groupId>
->>>>>>> ef1177e1ac8996f5cc6a92d240cf7f6813d299e4
     <artifactId>traveling-crew</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
@@ -20,11 +13,11 @@
         <module>eureka-server</module>
         <module>tvapi</module>
         <module>core</module>
+        <module>socket</module>
     </modules>
 
     <name>travelingcrew</name>
 
-<!--    <url>https://www.amigoscode.com</url>-->
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

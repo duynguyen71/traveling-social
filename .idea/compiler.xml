@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="tvapi" />
         <module name="core" />
+        <module name="socket" />
         <module name="eureka-server" />
       </profile>
     </annotationProcessing>
@@ -17,7 +18,6 @@
       <module name="batchjob" target="17" />
       <module name="batchjobb" target="17" />
       <module name="eureku-server" target="17" />
-      <module name="socket" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>
